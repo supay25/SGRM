@@ -1,23 +1,33 @@
 import { useState } from 'react'
+import { loginRequest } from '../api/auth.api' 
+import { useNavigate } from 'react-router-dom'
 
 export default function Login() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setError('')
 
-    // TODO: Aquí conectarás tu servicio de Axios
-    // Ejemplo de lo que irá aquí:
-    //
-    // import authService from '../services/auth.service'
-    //
-    // try {
-    //   const data = await authService.login({ email, password })
-    //   // Guardar token, redirigir, etc.
-    // } catch (error) {
-    //   // Manejar error de credenciales inválidas
-    // }
+    try {
+      const data = await loginRequest(email, password);
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('accountType', data.accountType);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      if (data.accountType === 'RESTAURANT') {
+        navigate('/home');
+      } else {
+        navigate('/dashboard'); // Owner/SuperAdmin, más adelante
+      }
+
+    } catch (err) {
+      setError(err.response?.data?.error || 'Error al iniciar sesión');
+    }
   }
 
   return (

@@ -1,12 +1,21 @@
-import { registrarUsuario } from '../services/auth.service.js';
+import { registrarUsuario, loginUsuario } from '../services/auth.service.js';
 
-export const register = async (req, res) => {
-  const { name, email, password } = req.body;
-
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: 'Todos los campos son requeridos' });
+export const registrar = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const usuario = await registrarUsuario({ name, email, password });
+    res.status(201).json(usuario);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
+};
 
-  const nuevoUsuario = await registrarUsuario({ name, email, password });
-  res.status(201).json({ message: 'Usuario creado exitosamente', user: nuevoUsuario });
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const resultado = await loginUsuario(email, password);
+    res.status(200).json(resultado);
+  } catch (error) {
+    res.status(401).json({ error: error.message });
+  }
 };
