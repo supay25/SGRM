@@ -4,115 +4,110 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SGRM is a full-stack application with:
-- **Backend**: Node.js/Express server with REST API
-- **Database**: PostgreSQL with Prisma ORM
-- **Frontend**: Empty client directory (not yet implemented)
+SGRM (Sistema de Gestión de Restaurante) is a full-stack app for managing restaurants, with two account types authenticating against the same login endpoint:
+- **Backend** (`server/`): Node.js/Express REST API with PostgreSQL via Prisma ORM
+- **Frontend** (`client/`): React 19 + Vite SPA, styled with Tailwind CSS v4, routed with React Router v7
 
-The project uses modern authentication patterns with JWT tokens and password hashing with bcryptjs.
+Authentication uses JWT tokens (`jsonwebtoken`) and bcrypt password hashing (`bcryptjs`). Code and comments are written in Spanish; keep that convention when editing `server/` and `client/` source files.
 
 ## Architecture
 
-### Backend Structure
+### Backend Structure (`server/src/`)
 
-The server follows a layered MVC-inspired architecture:
+Layered MVC-inspired architecture:
 
 ```
 server/src/
-├── index.js           # Express app setup, middleware configuration, and server startup
-├── config/
-│   └── db.js         # Prisma client singleton for database access
-├── routes/
-│   └── auth.routes.js # Route definitions for authentication endpoints
-├── controllers/
-│   └── auth.controller.js # Request handlers and business logic
-└── services/
-    └── auth.service.js    # Service layer for business operations (e.g., registrarUsuario)
+├── index.js                    # Express app setup, middleware, server startup
+├── config/db.js                # Prisma client singleton (uses PrismaPg adapter + pg Pool)
+├── routes/auth.routes.js       # Route definitions
+├── controllers/auth.controller.js  # HTTP request handlers
+├── services/auth.service.js    # Business logic + DB operations
+├── middleware/auth.middleware.js   # verificarToken — JWT verification middleware
+└── helpers/jwt.js              # generateToken — JWT signing helper
 ```
 
-**Key Architecture Patterns:**
-- Express middleware stack includes CORS, Morgan logging, and JSON parsing
-- Prisma Client is exported as a singleton from `config/db.js` for use across controllers/services
-- Services layer handles database operations and business logic
-- Controllers act as HTTP request handlers that call services
-- Routes define the API endpoints and map them to controllers
+**Key patterns:**
+- Prisma Client is instantiated in `config/db.js` with the `@prisma/adapter-pg` driver adapter (not the default Prisma engine) and exported as a singleton for use across services.
+- Services handle DB access and business logic; controllers only translate HTTP ↔ service calls; routes map endpoints to controllers.
+- `loginUsuario` (in `auth.service.js`) checks **both** the `User` and `Restaurant` tables by email (in that order) to determine `accountType` (`USER` or `RESTAURANT`), since both can log in through the same `/api/auth/login` endpoint. The JWT payload and returned user object shape differ slightly by account type (`role` is only present for `USER`).
+- Protected routes should use `verificarToken` from `auth.middleware.js`, which reads the `Authorization: Bearer <token>` header and attaches the decoded payload to `req.usuario`.
 
-### Database Schema
+### Database Schema (`server/prisma/schema.prisma`)
 
-PostgreSQL database with Prisma as ORM. Currently defined schema in `prisma/schema.prisma`:
-- **User model**: Stores user credentials with roles (SUPER_ADMIN, OWNER)
-  - Fields: id, name, email (unique), password, role, isActive, timestamps
-  - Enum: UserRole with SUPER_ADMIN and OWNER values
+PostgreSQL via Prisma, using the `@prisma/adapter-pg` driver adapter (see `prisma.config.ts`, which loads `DATABASE_URL` via `dotenv/config`).
+
+- **User**: `id, name, email (unique), password, role, isActive, createdAt, updatedAt` — has many `Restaurant`. `role` enum: `SUPER_ADMIN | OWNER`.
+- **Restaurant**: `id, userId (FK → User), name, email (unique), password, phone?, address?, isActive, createdAt, updatedAt`. Restaurants authenticate independently with their own `email`/`password`, separate from the owning `User`'s credentials.
+
+### Frontend Structure (`client/src/`)
+
+```
+client/src/
+├── main.jsx                    # React root, wraps App in BrowserRouter
+├── App.jsx                     # Route definitions
+├── api/
+│   ├── axiosClient.js          # Axios instance; injects Bearer token from localStorage via request interceptor
+│   └── auth.api.js             # loginRequest — calls POST /auth/login
+├── components/RutaProtegida.jsx  # Route guard: redirects to /login if no token in localStorage
+└── pages/
+    ├── Login.jsx                # Login form; on success stores token/accountType/user in localStorage
+    ├── Home.jsx                 # Restaurant-side landing page
+    └── Dashboard.jsx             # Owner/SuperAdmin-side landing page
+```
+
+**Key patterns:**
+- Auth state is not held in React context/state — it lives entirely in `localStorage` (`token`, `accountType`, `user`), and `axiosClient`'s request interceptor reads `token` on every request.
+- `RutaProtegida` is a simple wrapper component (not a router-level guard) used per-route in `App.jsx` to gate access based on token presence only (no expiry/role check client-side).
+- After login, navigation branches on `accountType`: `RESTAURANT` → `/home`, otherwise (owner/super admin) → `/dashboard`.
+- API base URL comes from `VITE_API_URL` (set in `client/.env`).
+- Tailwind v4 is wired through `@tailwindcss/postcss` in `postcss.config.js` (not a `tailwind.config.js`-driven v3 setup, though a `tailwind.config.js` content-globs file is still present).
 
 ## Common Commands
 
-### Development
+### Backend (`server/`)
 
 ```bash
-# Install dependencies
-npm install
+npm install              # Install dependencies
+npm run dev               # Run with nodemon hot-reload
+npm start                 # Run in production mode
 
-# Run server in development mode with hot-reload (nodemon)
-npm run dev
-
-# Run server in production mode
-npm start
+npx prisma migrate dev --name <migration_name>   # Create + apply a migration after schema changes
+npx prisma migrate deploy                         # Apply pending migrations
+npx prisma studio                                  # Web UI for DB inspection
+npx prisma generate                                 # Regenerate Prisma Client (also runs on install)
 ```
 
-### Database
+### Frontend (`client/`)
 
 ```bash
-# Apply pending Prisma migrations to the database
-npx prisma migrate deploy
-
-# Create and apply a new migration after schema changes
-npx prisma migrate dev --name <migration_name>
-
-# Open Prisma Studio (web UI for database inspection)
-npx prisma studio
-
-# Generate Prisma Client code (done automatically on install)
-npx prisma generate
+npm install       # Install dependencies
+npm run dev        # Start Vite dev server
+npm run build      # Production build
+npm run lint       # ESLint
+npm run preview    # Preview production build locally
 ```
+
+There is no test suite configured in either `server/` or `client/` yet.
 
 ## Environment Setup
 
-The project requires a `.env` file at `server/.env` with:
-
+`server/.env`:
 ```
 DATABASE_URL="postgresql://user:password@host:port/database_name?schema=public"
-PORT=5000  # Optional, defaults to 5000
+PORT=5000          # Optional, defaults to 5000
+JWT_SECRET=...      # Required — used to sign/verify JWTs
 ```
+Default local setup: PostgreSQL at `localhost:5432`, database `SGRM`.
 
-The current setup connects to PostgreSQL at localhost:5432 with database name SGRM.
+`client/.env`:
+```
+VITE_API_URL=...   # Base URL for the backend API, consumed by axiosClient
+```
 
 ## Development Workflow
 
-1. **Making Database Changes**: Update the schema in `prisma/schema.prisma`, then run `npx prisma migrate dev` to create and apply migrations.
-
-2. **Adding API Endpoints**: 
-   - Define route in `server/src/routes/*.routes.js`
-   - Create controller method in `server/src/controllers/*.controller.js`
-   - Create service method in `server/src/services/*.service.js` for database operations
-   - Import Prisma from `config/db.js` in services
-
-3. **Testing Endpoints**: Use `npm run dev` to start the server. Health check available at `GET /api/health`.
-
-## Dependencies
-
-**Core**:
-- `express@5.2.1` - Web framework
-- `@prisma/client@7.8.0` - Database ORM and client
-- `dotenv@17.4.2` - Environment variable management
-
-**Authentication**:
-- `jsonwebtoken@9.0.3` - JWT token generation and verification
-- `bcryptjs@3.0.3` - Password hashing
-
-**Utilities**:
-- `cors@2.8.6` - CORS middleware
-- `morgan@1.11.0` - HTTP request logger
-
-**Dev**:
-- `prisma@7.8.0` - Prisma CLI and schema tooling
-- `nodemon@3.1.14` - Automatic server restart on file changes
+1. **Database changes**: edit `server/prisma/schema.prisma`, then `npx prisma migrate dev --name <name>`.
+2. **New backend endpoints**: add route in `server/src/routes/*.routes.js` → controller in `server/src/controllers/*.controller.js` → service in `server/src/services/*.service.js` (import Prisma from `config/db.js`). Wrap with `verificarToken` middleware if the route requires authentication.
+3. **New frontend pages**: add to `client/src/pages/`, wire into `client/src/App.jsx`, wrap with `RutaProtegida` if it requires auth. API calls go through `axiosClient` from `client/src/api/`.
+4. Health check: `GET /api/health` on the backend.

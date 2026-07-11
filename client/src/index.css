@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+/* Identidad visual SGRM: gris oscuro minimalista, tipografía clara, acentos sobrios */
+@theme {
+  --color-page: #1c1917;
+  --color-surface: #292524;
+  --color-surface-2: #44403c;
+  --color-line: #57534e;
+  --color-ink: #f4f4f5;
+  --color-muted: #a8a29e;
+  --color-ember: #d97706;
+  --color-ember-dark: #b45309;
+  --color-success: #34d399;
+  --color-danger: #fb7185;
+}

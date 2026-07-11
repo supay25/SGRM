@@ -3,6 +3,9 @@ import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes.js';
+import seccionRouter from './routes/seccion.routes.js'
+import categoriasRouter from './routes/categorias.routes.js'
+import productosRouter from './routes/productos.routes.js'
 
 // Configurar variables de entorno
 dotenv.config();
@@ -17,7 +20,9 @@ app.use(express.json()); // Para que el servidor entienda JSON
 
 // Rutas
 app.use('/api/auth', authRoutes);
-
+app.use('/api/secciones', seccionRouter);
+app.use('/api/categorias', categoriasRouter);
+app.use('/api/productos', productosRouter);
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'El servidor está vivo y respondiendo' });

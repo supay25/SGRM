@@ -11,16 +11,20 @@ datasource db {
   provider = "postgresql"
 }
 
+// ==========================================
+// AUTENTICACIÓN
+// ==========================================
+
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  role      UserRole @default(OWNER)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  restaurants  Restaurant[]
+  id          Int          @id @default(autoincrement())
+  name        String
+  email       String       @unique
+  password    String
+  role        UserRole     @default(OWNER)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  restaurants Restaurant[]
 }
 
 enum UserRole {
@@ -28,19 +32,167 @@ enum UserRole {
   OWNER
 }
 
-
 model Restaurant {
-  id           Int          @id @default(autoincrement())
-  userId       Int          
-  user         User         @relation(fields: [userId], references: [id])
-  name         String
-  email        String       @unique
-  password     String
-  phone        String?
-  address      String?
-  isActive     Boolean      @default(true)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  address   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  categorias Categoria[]
+  productos  Producto[]
+  secciones  Seccion[]
+  mesas      Mesa[]
+  ordenes    Orden[]
+  facturas   Factura[]
+  cierres    Cierre[]
 }
 
+// ==========================================
+// MENÚ
+// ==========================================
+
+model Categoria {
+  id           Int        @id @default(autoincrement())
+  nombre       String
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  productos    Producto[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Producto {
+  id           Int        @id @default(autoincrement())
+  nombre       String
+  precio       Decimal    @db.Decimal(10, 2)
+  categoriaId  Int
+  categoria    Categoria  @relation(fields: [categoriaId], references: [id])
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  ordenItems   OrdenItem[]
+  facturaItems FacturaItem[]
+}
+
+// ==========================================
+// SECCIONES (reglas de negocio configurables por el propio restaurante)
+// ==========================================
+
+model Seccion {
+  id                 Int        @id @default(autoincrement())
+  nombre             String // "Salón", "Para Llevar", "Uber"
+  aplicaServicio     Boolean    @default(false)
+  porcentajeServicio Decimal    @default(0) @db.Decimal(5, 2)
+  aplicaComision     Boolean    @default(false)
+  porcentajeComision Decimal    @default(0) @db.Decimal(5, 2)
+  restaurantId       Int
+  restaurant         Restaurant @relation(fields: [restaurantId], references: [id])
+  mesas              Mesa[]
+  facturas           Factura[]
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+}
+
+// ==========================================
+// MESAS
+// ==========================================
+
+model Mesa {
+  id           Int        @id @default(autoincrement())
+  nombre       String
+  seccionId    Int
+  seccion      Seccion    @relation(fields: [seccionId], references: [id])
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  ordenes      Orden[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+// ==========================================
+// ORDEN (carrito temporal por mesa, se borra al facturar)
+// ==========================================
+
+model Orden {
+  id           Int         @id @default(autoincrement())
+  mesaId       Int
+  mesa         Mesa        @relation(fields: [mesaId], references: [id])
+  restaurantId Int
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  items        OrdenItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model OrdenItem {
+  id             Int      @id @default(autoincrement())
+  ordenId        Int
+  orden          Orden    @relation(fields: [ordenId], references: [id], onDelete: Cascade)
+  productoId     Int
+  producto       Producto @relation(fields: [productoId], references: [id])
+  cantidad       Int
+  precioUnitario Decimal  @db.Decimal(10, 2)
+  createdAt      DateTime @default(now())
+}
+
+// ==========================================
+// FACTURA (registro permanente, base de los reportes)
+// ==========================================
+
+model Factura {
+  id            Int           @id @default(autoincrement())
+  numeroFactura Int
+  nombreMesa    String // snapshot, ej. "Mesa 5" — solo para mostrar en el recibo
+  seccionId     Int
+  seccion       Seccion       @relation(fields: [seccionId], references: [id])
+  restaurantId  Int
+  restaurant    Restaurant    @relation(fields: [restaurantId], references: [id])
+  items         FacturaItem[]
+  subtotal      Decimal       @db.Decimal(10, 2)
+  montoServicio Decimal       @default(0) @db.Decimal(10, 2)
+  montoComision Decimal       @default(0) @db.Decimal(10, 2)
+  montoNeto     Decimal       @db.Decimal(10, 2)
+  fecha         DateTime      @default(now())
+  createdAt     DateTime      @default(now())
+
+  @@unique([restaurantId, numeroFactura])
+}
+
+model FacturaItem {
+  id             Int      @id @default(autoincrement())
+  facturaId      Int
+  factura        Factura  @relation(fields: [facturaId], references: [id], onDelete: Cascade)
+  productoId     Int
+  producto       Producto @relation(fields: [productoId], references: [id])
+  nombreProducto String // snapshot: no cambia aunque el producto se edite/borre después
+  cantidad       Int
+  precioUnitario Decimal  @db.Decimal(10, 2)
+}
+
+// ==========================================
+// CIERRE (bloqueo diario + resumen de facturación)
+// ==========================================
+
+model Cierre {
+  id             Int        @id @default(autoincrement())
+  restaurantId   Int
+  restaurant     Restaurant @relation(fields: [restaurantId], references: [id])
+  fecha          DateTime   @db.Date
+  primeraFactura Int // numeroFactura más bajo del día
+  ultimaFactura  Int // numeroFactura más alto del día
+  totalNeto      Decimal    @db.Decimal(10, 2)
+  totalServicio  Decimal    @db.Decimal(10, 2)
+  ingresoReal    Decimal    @db.Decimal(10, 2)
+  createdAt      DateTime   @default(now())
+
+  @@unique([restaurantId, fecha])
+}
