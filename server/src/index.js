@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.routes.js';
 import seccionRouter from './routes/seccion.routes.js'
 import categoriasRouter from './routes/categorias.routes.js'
 import productosRouter from './routes/productos.routes.js'
+import mesaRouter from './routes/mesas.routes.js'
 
 // Configurar variables de entorno
 dotenv.config();
@@ -23,6 +24,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/secciones', seccionRouter);
 app.use('/api/categorias', categoriasRouter);
 app.use('/api/productos', productosRouter);
+app.use('/api/mesas', mesaRouter);
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'El servidor está vivo y respondiendo' });
