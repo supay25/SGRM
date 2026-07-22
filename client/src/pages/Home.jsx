@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/navbar'
 import SeccionTabs from '../components/SeccionTabs'
 import MesaCard from '../components/MesaCard'
 import MesaFormModal from '../components/MesaFormModal'
-import useMesas from '../hooks/useMesas'
+import useMesas from '../hooks/useMesas.js'
+
+
 
 export default function Home() {
   const navigate = useNavigate()
@@ -13,6 +15,12 @@ export default function Home() {
   const [seccionActivaId, setSeccionActivaId] = useState(secciones[0]?.id ?? null)
   const [modalAbierto, setModalAbierto] = useState(false)
   const [mesaEnEdicion, setMesaEnEdicion] = useState(null)
+
+  useEffect(() => {
+    if (secciones.length > 0 && seccionActivaId === null) {
+      setSeccionActivaId(secciones[0].id)
+    }
+  }, [secciones, seccionActivaId])
 
   const seccionActiva = useMemo(
     () => secciones.find((seccion) => seccion.id === seccionActivaId) ?? null,
@@ -76,8 +84,7 @@ export default function Home() {
   }
 
   function handleAbrirOrden(mesa) {
-    // TODO: navegar a la vista de la orden activa de esta mesa, ej. /home/mesas/:id
-    console.log('Abrir orden de mesa:', mesa)
+    navigate(`/home/mesas/${mesa.id}`)
   }
 
   return (

@@ -52,6 +52,7 @@ model Restaurant {
   ordenes    Orden[]
   facturas   Factura[]
   cierres    Cierre[]
+  itemsAnulados ItemAnulado[]
 }
 
 // ==========================================
@@ -81,6 +82,7 @@ model Producto {
 
   ordenItems   OrdenItem[]
   facturaItems FacturaItem[]
+  itemsAnulados ItemAnulado[]
 }
 
 // ==========================================
@@ -131,17 +133,32 @@ model Orden {
   items        OrdenItem[]
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+  
 }
 
 model OrdenItem {
   id             Int      @id @default(autoincrement())
-  ordenId        Int
+  ordenId        Int      @unique
   orden          Orden    @relation(fields: [ordenId], references: [id], onDelete: Cascade)
   productoId     Int
   producto       Producto @relation(fields: [productoId], references: [id])
   cantidad       Int
   precioUnitario Decimal  @db.Decimal(10, 2)
   createdAt      DateTime @default(now())
+  @@unique([ordenId, productoId])
+}
+
+model ItemAnulado {
+  id              Int         @id @default(autoincrement())
+  restaurantId    Int
+  restaurant      Restaurant  @relation(fields: [restaurantId], references: [id])
+  nombreMesa      String
+  productoId      Int
+  producto        Producto    @relation(fields: [productoId], references: [id])
+  nombreProducto  String
+  cantidad        Int
+  precioUnitario  Decimal     @db.Decimal(10, 2)
+  fecha           DateTime    @default(now())
 }
 
 // ==========================================
@@ -196,3 +213,6 @@ model Cierre {
 
   @@unique([restaurantId, fecha])
 }
+
+
+

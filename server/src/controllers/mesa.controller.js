@@ -1,5 +1,5 @@
 // mesa.cotroller.js
-import {crearMesa, listarMesas, actualizarMesa, eliminarMesa }from '../services/mesa.service.js';
+import {crearMesa, listarMesas, actualizarMesa, eliminarMesa, obtenerMesa }from '../services/mesa.service.js';
  
 export const crear = async (req, res) => {
   try {
@@ -50,3 +50,15 @@ export const eliminar = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 }
+
+
+export const obtener = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const restaurantId = req.usuario.id;
+    const mesa = await obtenerMesa(Number(id), restaurantId);
+    res.status(200).json(mesa);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};

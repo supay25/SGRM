@@ -1,4 +1,4 @@
-// producto.service.js
+// mesa.service.js
 import prisma from '../config/db.js';
 
 export const crearMesa = async (restaurantId, datos) => {
@@ -84,4 +84,13 @@ export const eliminarMesa = async (mesaId, restaurantId) => {
         where: { id: mesaId },
     });
 
+};
+
+export const obtenerMesa = async (mesaId, restaurantId) => {
+  const mesa = await prisma.mesa.findFirst({
+    where: { id: mesaId, restaurantId },
+    include: { seccion: true },
+  });
+  if (!mesa) throw new Error('Mesa no encontrada');
+  return mesa;
 };

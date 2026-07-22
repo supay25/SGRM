@@ -7,6 +7,9 @@ import seccionRouter from './routes/seccion.routes.js'
 import categoriasRouter from './routes/categorias.routes.js'
 import productosRouter from './routes/productos.routes.js'
 import mesaRouter from './routes/mesas.routes.js'
+import ordenRoutes from './routes/orden.routes.js';
+import facturaRoutes from './routes/factura.routes.js';
+
 
 // Configurar variables de entorno
 dotenv.config();
@@ -25,6 +28,8 @@ app.use('/api/secciones', seccionRouter);
 app.use('/api/categorias', categoriasRouter);
 app.use('/api/productos', productosRouter);
 app.use('/api/mesas', mesaRouter);
+app.use('/api/ordenes', ordenRoutes);
+app.use('/api/facturas', facturaRoutes);
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'El servidor está vivo y respondiendo' });
