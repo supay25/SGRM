@@ -126,7 +126,7 @@ model Mesa {
 
 model Orden {
   id           Int         @id @default(autoincrement())
-  mesaId       Int
+  mesaId       Int         @unique
   mesa         Mesa        @relation(fields: [mesaId], references: [id])
   restaurantId Int
   restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
@@ -138,7 +138,7 @@ model Orden {
 
 model OrdenItem {
   id             Int      @id @default(autoincrement())
-  ordenId        Int      @unique
+  ordenId        Int
   orden          Orden    @relation(fields: [ordenId], references: [id], onDelete: Cascade)
   productoId     Int
   producto       Producto @relation(fields: [productoId], references: [id])
@@ -180,7 +180,7 @@ model Factura {
   montoNeto     Decimal       @db.Decimal(10, 2)
   fecha         DateTime      @default(now())
   createdAt     DateTime      @default(now())
-
+  anulada       Boolean       @default(false)
   @@unique([restaurantId, numeroFactura])
 }
 

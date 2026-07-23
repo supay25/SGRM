@@ -93,3 +93,42 @@ export const listarFacturas = async (restaurantId) => {
     orderBy: { numeroFactura: 'desc' },
   });
 };
+
+
+
+
+export const anularFactura = async (restaurantId, facturaId) => {
+  const factura = await prisma.factura.findFirst({
+    where: { id: facturaId, restaurantId },
+  });
+
+  if (!factura) throw new Error('Factura no encontrada');
+  if (factura.anulada) throw new Error('Esta factura ya está anulada');
+
+  // No se puede anular una factura de un día ya cerrado
+  const fechaFactura = new Date(factura.fecha);
+  fechaFactura.setHours(0, 0, 0, 0);
+
+  const cierre = await prisma.cierre.findFirst({
+    where: { restaurantId, fecha: fechaFactura },
+  });
+  if (cierre) throw new Error('No se puede anular: el día ya fue cerrado');
+
+  return await prisma.factura.update({
+    where: { id: facturaId },
+    data: {
+      anulada: true,
+    },
+  });
+}; 
+
+
+
+export const obtenerFactura = async (restaurantId, facturaId) => {
+  const factura = await prisma.factura.findFirst({
+    where: { id: facturaId, restaurantId },
+    include: { items: true, seccion: true },
+  });
+  if (!factura) throw new Error('Factura no encontrada');
+  return factura;
+};

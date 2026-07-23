@@ -19,6 +19,7 @@ export const crearCierre = async (restaurantId) => {
   const facturas = await prisma.factura.findMany({
     where: {
       restaurantId,
+      anulada: false,
       fecha: { gte: inicioDia, lte: finDia },
     },
     orderBy: { numeroFactura: 'asc' },

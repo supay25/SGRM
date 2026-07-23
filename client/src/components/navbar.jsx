@@ -1,16 +1,24 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-// TODO: cuando existan las rutas reales, reemplazar por <NavLink> de react-router-dom
-// y derivar "activo" desde useLocation() en lugar del prop activeLink.
+// TODO: cuando exista la ruta real de "Menú", agregarle su path aquí y
+// reemplazar por <NavLink> de react-router-dom, derivando "activo" desde
+// useLocation() en lugar del prop activeLink.
 const ENLACES = [
-  { id: 'home', etiqueta: 'Home' },
-  { id: 'menu', etiqueta: 'Menú' },
-  { id: 'reportes', etiqueta: 'Reportes' },
-  { id: 'caja', etiqueta: 'Cierre de caja' },
+  { id: 'home', etiqueta: 'Home', ruta: '/home' },
+  { id: 'menu', etiqueta: 'Menú', ruta: null },
+  { id: 'reportes', etiqueta: 'Reportes', ruta: '/home/facturas' },
+  { id: 'caja', etiqueta: 'Cierre de caja', ruta: '/home/cierre' },
 ]
 
 export default function Navbar({ nombreRestaurante = 'Mi Restaurante', activeLink = 'home', onLogout }) {
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false)
+  const navigate = useNavigate()
+
+  function handleClickEnlace(event, enlace) {
+    event.preventDefault()
+    if (enlace.ruta) navigate(enlace.ruta)
+  }
 
   return (
     <nav className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur-sm">
@@ -30,7 +38,7 @@ export default function Navbar({ nombreRestaurante = 'Mi Restaurante', activeLin
               <a
                 key={enlace.id}
                 href="#"
-                onClick={(event) => event.preventDefault()}
+                onClick={(event) => handleClickEnlace(event, enlace)}
                 className={`
                   px-3 py-2 rounded-md text-sm font-medium transition-colors
                   ${
@@ -80,7 +88,7 @@ export default function Navbar({ nombreRestaurante = 'Mi Restaurante', activeLin
                 key={enlace.id}
                 href="#"
                 onClick={(event) => {
-                  event.preventDefault()
+                  handleClickEnlace(event, enlace)
                   setMenuMovilAbierto(false)
                 }}
                 className={`

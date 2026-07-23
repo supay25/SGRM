@@ -8,7 +8,7 @@ import { formatearColones } from '../utils/formato'
 export default function OrdenMesa() {
   const { mesaId } = useParams()
   const navigate = useNavigate()
-
+ 
   const {
     cargando,
     mesa,
