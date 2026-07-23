@@ -9,6 +9,7 @@ import productosRouter from './routes/productos.routes.js'
 import mesaRouter from './routes/mesas.routes.js'
 import ordenRoutes from './routes/orden.routes.js';
 import facturaRoutes from './routes/factura.routes.js';
+import cierreRoutes from './routes/cierres.routes.js';
 
 
 // Configurar variables de entorno
@@ -30,6 +31,9 @@ app.use('/api/productos', productosRouter);
 app.use('/api/mesas', mesaRouter);
 app.use('/api/ordenes', ordenRoutes);
 app.use('/api/facturas', facturaRoutes);
+app.use('/api/cierres', cierreRoutes);
+
+
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'El servidor está vivo y respondiendo' });

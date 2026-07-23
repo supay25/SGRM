@@ -16,6 +16,10 @@ export default function useOrdenMesa(mesaId) {
 
   const seccion = mesa?.seccion ?? null
 
+
+
+
+  
   useEffect(() => {
     const cargar = async () => {
       try {
@@ -46,6 +50,11 @@ export default function useOrdenMesa(mesaId) {
     }
     cargar()
   }, [mesaId])
+
+
+
+
+
 
   const categorias = useMemo(() => {
     const vistas = new Map()
