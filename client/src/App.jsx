@@ -7,6 +7,8 @@ import Facturas from './pages/Facturas'
 import CierreCaja from './pages/CierreCaja'
 import RutaProtegida from './components/RutaProtegida'
 import Dashboard from './pages/Dashboard'
+import OwnerDashboard from './pages/OwnerDashboard'
+import OwnerRestaurante from './pages/OwnerRestaurante'
 
 function App() {
   return (
@@ -40,6 +42,17 @@ function App() {
       <Route path="/Dashboard" element={
         <RutaProtegida>
           <Dashboard />
+        </RutaProtegida>
+      } />
+
+      <Route path="/owner" element={
+        <RutaProtegida>
+          <OwnerDashboard />
+        </RutaProtegida>
+      } />
+      <Route path="/owner/restaurantes/:id" element={
+        <RutaProtegida>
+          <OwnerRestaurante />
         </RutaProtegida>
       } />
 

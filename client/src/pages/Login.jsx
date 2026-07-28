@@ -22,7 +22,7 @@ export default function Login() {
       if (data.accountType === 'RESTAURANT') {
         navigate('/home');
       } else {
-        navigate('/dashboard'); // Owner/SuperAdmin, más adelante
+        navigate('/owner'); // Owner/SuperAdmin
       }
 
     } catch (err) {

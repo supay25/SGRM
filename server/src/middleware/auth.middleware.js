@@ -23,3 +23,13 @@ export const verificarToken = (req, res, next) => {
     return res.status(401).json({ error: 'Token inválido o expirado' });
   }
 };
+
+
+
+
+export const soloOwner = (req, res, next) => {
+  if (req.usuario.type !== 'USER' || req.usuario.role !== 'OWNER') {
+    return res.status(403).json({ error: 'No autorizado' });
+  }
+  next();
+};

@@ -10,7 +10,7 @@ import mesaRouter from './routes/mesas.routes.js'
 import ordenRoutes from './routes/orden.routes.js';
 import facturaRoutes from './routes/factura.routes.js';
 import cierreRoutes from './routes/cierres.routes.js';
-
+import ownerRoutes from './routes/owner.routes/owner.routes.js'
 
 // Configurar variables de entorno
 dotenv.config();
@@ -32,6 +32,7 @@ app.use('/api/mesas', mesaRouter);
 app.use('/api/ordenes', ordenRoutes);
 app.use('/api/facturas', facturaRoutes);
 app.use('/api/cierres', cierreRoutes);
+app.use('/api/owner', ownerRoutes);
 
 
 // Ruta de prueba
