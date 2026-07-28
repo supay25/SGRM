@@ -43,7 +43,7 @@ export default function FacturaCard({ factura, seleccionada = false, onAbrir }) 
           )}
         </div>
         <p className="mt-0.5 text-sm text-muted">
-          {factura.nombreSeccion}
+          {factura.seccion.nombre}
           {' · '}
           {formatearHora(factura.fecha)}
         </p>

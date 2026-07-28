@@ -10,7 +10,12 @@ export const crearCierreRequest = async () => {
   return response.data;
 };
 
-export const getCierreReporteRequest = async (cierreId) => {
+export const getReporteCierreRequest = async (cierreId) => {
   const response = await axiosClient.get(`/cierres/${cierreId}/reporte`);
+  return response.data;
+};
+
+export const getResumenHoyRequest = async () => {
+  const response = await axiosClient.get('/cierres/resumen-hoy');
   return response.data;
 };

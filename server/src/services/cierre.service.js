@@ -92,3 +92,44 @@ export const listarCierres = async (restaurantId) => {
     orderBy: { fecha: 'desc' },
   });
 };
+
+
+
+
+
+
+
+export const resumenDelDia = async (restaurantId) => {
+  const inicioDia = new Date();
+  inicioDia.setHours(0, 0, 0, 0);
+  const finDia = new Date();
+  finDia.setHours(23, 59, 59, 999);
+
+  const facturas = await prisma.factura.findMany({
+    where: { restaurantId, anulada: false, fecha: { gte: inicioDia, lte: finDia } },
+    orderBy: { numeroFactura: 'asc' },
+  });
+
+  const totalNeto = facturas.reduce((acc, f) => acc.plus(f.montoNeto), new Prisma.Decimal(0));
+  const totalServicio = facturas.reduce((acc, f) => acc.plus(f.montoServicio), new Prisma.Decimal(0));
+  const ingresoReal = totalNeto.minus(totalServicio);
+
+  const anulados = await prisma.itemAnulado.findMany({
+    where: { restaurantId, fecha: { gte: inicioDia, lte: finDia } },
+  });
+
+  const cierreHoy = await prisma.cierre.findFirst({
+    where: { restaurantId, fecha: inicioDia },
+  });
+
+  return {
+    cantidad: facturas.length,
+    primeraFactura: facturas[0]?.numeroFactura ?? null,
+    ultimaFactura: facturas[facturas.length - 1]?.numeroFactura ?? null,
+    totalNeto,
+    totalServicio,
+    ingresoReal,
+    anulados,
+    yaCerrado: Boolean(cierreHoy),
+  };
+};

@@ -1,12 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-// TODO: cuando exista la ruta real de "Menú", agregarle su path aquí y
-// reemplazar por <NavLink> de react-router-dom, derivando "activo" desde
+// TODO: reemplazar por <NavLink> de react-router-dom, derivando "activo" desde
 // useLocation() en lugar del prop activeLink.
 const ENLACES = [
   { id: 'home', etiqueta: 'Home', ruta: '/home' },
-  { id: 'menu', etiqueta: 'Menú', ruta: null },
+  { id: 'menu', etiqueta: 'Menú', ruta: '/home/menu' },
   { id: 'reportes', etiqueta: 'Reportes', ruta: '/home/facturas' },
   { id: 'caja', etiqueta: 'Cierre de caja', ruta: '/home/cierre' },
 ]

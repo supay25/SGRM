@@ -70,10 +70,6 @@ export default function Facturas() {
               </span>
               <p className="text-base font-semibold text-ink">{formatearColones(resumenDelDia.totalServicio)}</p>
             </div>
-            <div className="rounded-lg border border-line bg-surface px-4 py-2.5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted">Comisiones</span>
-              <p className="text-base font-semibold text-ink">{formatearColones(resumenDelDia.totalComision)}</p>
-            </div>
           </div>
         )}
 

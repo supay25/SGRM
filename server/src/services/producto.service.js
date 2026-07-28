@@ -25,7 +25,7 @@ export const crearProducto = async (restaurantId, datos) => {
 
 export const listarProductos = async (restaurantId) => {
     return await prisma.producto.findMany({
-        where: { restaurantId },
+        where: { restaurantId, activo: true },
         include: { categoria: true }, // trae el nombre de la categoría junto con el producto
     });
 };
@@ -62,8 +62,10 @@ export const actualizarProducto = async (productoId, restaurantId, datos) => {
 };
 
 
-export const eliminarProductos = async(productoId, restaurantId)=>{
 
+
+
+export const eliminarProducto = async (productoId, restaurantId) => {
     const productoExiste = await prisma.producto.findFirst({
         where: { id: productoId, restaurantId },
     });
@@ -72,8 +74,8 @@ export const eliminarProductos = async(productoId, restaurantId)=>{
         throw new Error("Producto no encontrado");
     }
 
-    return await prisma.producto.delete({
-        where: { id: productoId},
+    return await prisma.producto.update({
+        where: { id: productoId },
+        data: { activo: false },
     });
-
 };

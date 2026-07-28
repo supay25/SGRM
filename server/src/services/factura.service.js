@@ -87,13 +87,23 @@ export const crearFactura = async (restaurantId, mesaId) => {
 
 
 
+
+
+
 export const listarFacturas = async (restaurantId) => {
+  const inicioDia = new Date();
+  const finDia = new Date();
+  inicioDia.setHours(0,0,0,0);
+  finDia.setHours(23,59,59, 999);
   return await prisma.factura.findMany({
-    where: { restaurantId },
-    orderBy: { numeroFactura: 'desc' },
+    where: {
+      restaurantId,
+      fecha: { gte: inicioDia, lte: finDia },
+    },
+    include: { seccion: true },
+    orderBy: { numeroFactura: 'asc' },
   });
 };
-
 
 
 

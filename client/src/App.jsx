@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Home from './pages/Home'
 import OrdenMesa from './pages/OrdenMesa'
+import Menu from './pages/Menu'
 import Facturas from './pages/Facturas'
 import CierreCaja from './pages/CierreCaja'
 import RutaProtegida from './components/RutaProtegida'
@@ -19,6 +20,11 @@ function App() {
       <Route path="/home/mesas/:mesaId" element={
         <RutaProtegida>
           <OrdenMesa />
+        </RutaProtegida>
+      } />
+      <Route path="/home/menu" element={
+        <RutaProtegida>
+          <Menu />
         </RutaProtegida>
       } />
       <Route path="/home/facturas" element={
