@@ -126,3 +126,40 @@ export const metricasRestaurante = async (ownerId, restaurantId) => {
       .reverse(), // del más viejo al más nuevo, para el gráfico de línea
   };
 };
+
+
+
+export const detalleRestaurante = async (ownerId, restaurantId) => {
+  const restaurante = await validarRestauranteDelOwner(ownerId, restaurantId);
+  return {
+    id: restaurante.id,
+    name: restaurante.name,
+    address: restaurante.address,
+    isActive: restaurante.isActive,
+  };
+};
+
+
+
+export const buscarFacturaPorNumero = async (ownerId, numFactura, restaurantId) => {
+  await validarRestauranteDelOwner(ownerId, restaurantId);
+
+  return await prisma.factura.findFirst({
+    where: { numeroFactura: numFactura, restaurantId },
+    include: {items: true, seccion: true}
+  });
+};
+
+
+
+
+
+export const buscarCierrePorFecha = async (ownerId, restaurantId, fecha) => {
+  await validarRestauranteDelOwner(ownerId, restaurantId);
+
+   const dia = new Date(`${fecha}T00:00:00.000Z`);
+
+  return await prisma.cierre.findFirst({
+    where: { restaurantId, fecha: dia },
+  });
+};

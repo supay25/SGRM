@@ -3,7 +3,11 @@ import { formatearColones } from '../utils/formato'
 import OwnerChartTooltip from './OwnerChartTooltip'
 
 function formatearFechaCorta(fecha) {
-  return new Date(`${fecha}T12:00:00`).toLocaleDateString('es-CR', { day: '2-digit', month: '2-digit' })
+  return new Date(fecha).toLocaleDateString('es-CR', {
+    day: '2-digit',
+    month: '2-digit',
+    timeZone: 'UTC',
+  })
 }
 
 export default function OwnerTendenciaChart({ data }) {

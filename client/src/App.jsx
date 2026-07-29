@@ -9,6 +9,8 @@ import RutaProtegida from './components/RutaProtegida'
 import Dashboard from './pages/Dashboard'
 import OwnerDashboard from './pages/OwnerDashboard'
 import OwnerRestaurante from './pages/OwnerRestaurante'
+import OwnerComparativa from './pages/OwnerComparativa'
+import OwnerConfiguracion from './pages/OwnerConfiguracion'
 
 function App() {
   return (
@@ -53,6 +55,16 @@ function App() {
       <Route path="/owner/restaurantes/:id" element={
         <RutaProtegida>
           <OwnerRestaurante />
+        </RutaProtegida>
+      } />
+      <Route path="/owner/comparativa" element={
+        <RutaProtegida>
+          <OwnerComparativa />
+        </RutaProtegida>
+      } />
+      <Route path="/owner/configuracion" element={
+        <RutaProtegida>
+          <OwnerConfiguracion />
         </RutaProtegida>
       } />
 

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import OwnerHeader from '../components/OwnerHeader'
+import OwnerNavbar from '../components/OwnerNavbar'
 import OwnerRestauranteCard from '../components/OwnerRestauranteCard'
 import useOwnerRestaurantes from '../hooks/useOwnerRestaurantes'
 
@@ -10,23 +10,16 @@ export default function OwnerDashboard() {
   const usuario = JSON.parse(localStorage.getItem('user') ?? 'null')
   const nombreOwner = usuario?.name ?? 'Dueño'
 
-  function handleLogout() {
-    localStorage.removeItem('token')
-    localStorage.removeItem('accountType')
-    localStorage.removeItem('user')
-    navigate('/login')
-  }
-
   function handleAbrirRestaurante(id) {
     navigate(`/owner/restaurantes/${id}`)
   }
 
   return (
     <div className="min-h-screen bg-page">
-      <OwnerHeader titulo="Mis restaurantes" onLogout={handleLogout} />
+      <OwnerNavbar />
 
       <main className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
-        <h1 className="text-2xl font-bold text-ink tracking-tight">Hola, {nombreOwner}</h1>
+        <h1 className="text-2xl font-bold text-ink tracking-tight">Hola, Dueño</h1>
         <p className="mt-1 text-sm text-muted">Este es el estado de tus restaurantes hoy.</p>
 
         {cargando ? (
