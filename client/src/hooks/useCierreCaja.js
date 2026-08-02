@@ -53,5 +53,6 @@ export default function useCierreCaja() {
     diaCerrado: resumen?.yaCerrado ?? false,
     anulados: resumen?.anulados ?? [],
     cerrarCaja,
+    recargarResumen: cargar,
   }
 }

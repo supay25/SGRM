@@ -32,6 +32,8 @@ export default function MesaCard({ mesa, seccion, onAbrir, onEditar, onEliminar 
 
   const estado = ESTADO_ESTILOS[mesa.estado]
 
+  const conAcciones = Boolean(onEditar || onEliminar)
+
   return (
     <div
       onClick={() => onAbrir(mesa)}
@@ -48,6 +50,7 @@ export default function MesaCard({ mesa, seccion, onAbrir, onEditar, onEliminar 
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-lg font-semibold text-ink tracking-tight">{mesa.nombre}</h3>
 
+          {conAcciones && (
           <div ref={menuRef} className="relative -mr-1 -mt-1">
             <button
               type="button"
@@ -91,6 +94,7 @@ export default function MesaCard({ mesa, seccion, onAbrir, onEditar, onEliminar 
               </div>
             )}
           </div>
+          )}
         </div>
 
         <span

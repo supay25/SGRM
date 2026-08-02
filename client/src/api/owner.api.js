@@ -34,3 +34,33 @@ export const buscarCierrePorFechaRequest = async (restaurantId, fecha) => {
   });
   return response.data;
 };
+
+
+
+export const getReporteVentasRequest = async (id, desde, hasta) => {
+  const response = await axiosClient.get(`/owner/restaurantes/${id}/reportes/ventas`, {
+    params: { desde, hasta },
+  });
+  return response.data;
+};
+
+export const getReporteServicioRequest = async (id, desde, hasta) => {
+  const response = await axiosClient.get(`/owner/restaurantes/${id}/reportes/servicio`, {
+    params: { desde, hasta },
+  });
+  return response.data;
+};
+
+export const getReporteProductosRequest = async (id, desde, hasta) => {
+  const response = await axiosClient.get(`/owner/restaurantes/${id}/reportes/productos`, {
+    params: { desde, hasta },
+  });
+  return response.data;
+};
+
+export const getReporteConsecutivoRequest = async (id, desde, hasta) => {
+  const response = await axiosClient.get(`/owner/restaurantes/${id}/reportes/consecutivo`, {
+    params: { desde, hasta },
+  });
+  return response.data;
+};

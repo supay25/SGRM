@@ -9,8 +9,16 @@ import OwnerTendenciaChart from '../components/OwnerTendenciaChart'
 import HistorialCierreCard from '../components/HistorialCierreCard'
 import CierreBusquedaModal from '../components/CierreBusquedaModal'
 import FacturaBusquedaModal from '../components/FacturaBusquedaModal'
+import ConsultaRangoCard from '../components/ConsultaRangoCard'
+import EstadisticaInline from '../components/EstadisticaInline'
 import useOwnerRestaurantes from '../hooks/useOwnerRestaurantes'
 import useOwnerRestauranteDetalle from '../hooks/useOwnerRestauranteDetalle'
+import {
+  getVentasPorPeriodoRequest,
+  getServicioPorPeriodoRequest,
+  getProductosPorCategoriaRequest,
+  getConsecutivoFacturasRequest,
+} from '../api/reportes.api'
 import { formatearColones } from '../utils/formato'
 
 function TarjetaGrafico({ titulo, children }) {
@@ -152,52 +160,151 @@ export default function OwnerRestaurante() {
             )}
 
             {tabActivo === 'facturacion' && (
-              <div className="mt-6 space-y-8">
+              <div className="mt-6">
+                <h1 className="text-xl font-bold text-ink tracking-tight">Reportes</h1>
+                <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <section className="rounded-xl border border-line bg-surface p-5">
+                    <h2 className="text-sm font-semibold text-ink tracking-tight">Buscar cierre por fecha</h2>
+                    <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+                      <input
+                        type="date"
+                        value={fechaBusqueda}
+                        onChange={(event) => setFechaBusqueda(event.target.value)}
+                        style={{ accentColor: 'var(--color-ember)' }}
+                        className="w-full flex-1 rounded-lg border border-line bg-surface-2 px-3 py-2.5 text-sm text-ink scheme-dark focus:outline-none focus:ring-2 focus:ring-ember/60 focus:border-transparent transition"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleBuscarCierre}
+                        disabled={!fechaBusqueda || buscandoCierre}
+                        className="shrink-0 rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {buscandoCierre ? 'Buscando...' : 'Buscar'}
+                      </button>
+                    </div>
+                  </section>
 
+                  <section className="rounded-xl border border-line bg-surface p-5">
+                    <h2 className="text-sm font-semibold text-ink tracking-tight">Buscar factura por número</h2>
+                    <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+                      <input
+                        type="number"
+                        min="1"
+                        inputMode="numeric"
+                        placeholder="Ej. 342"
+                        value={numeroBusqueda}
+                        onChange={(event) => setNumeroBusqueda(event.target.value)}
+                        className="w-full flex-1 rounded-lg border border-line bg-surface-2 px-3 py-2.5 text-sm text-ink placeholder-muted focus:outline-none focus:ring-2 focus:ring-ember/60 focus:border-transparent transition"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleBuscarFactura}
+                        disabled={!numeroBusqueda.trim() || buscandoFactura}
+                        className="shrink-0 rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {buscandoFactura ? 'Buscando...' : 'Buscar'}
+                      </button>
+                    </div>
+                  </section>
 
-                <section className="rounded-xl border border-line bg-surface p-5">
-                  <h2 className="text-sm font-semibold text-ink tracking-tight">Buscar cierre por fecha</h2>
-                  <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-                    <input
-                      type="date"
-                      value={fechaBusqueda}
-                      onChange={(event) => setFechaBusqueda(event.target.value)}
-                      style={{ accentColor: 'var(--color-ember)' }}
-                      className="w-full flex-1 rounded-lg border border-line bg-surface-2 px-3 py-2.5 text-sm text-ink scheme-dark focus:outline-none focus:ring-2 focus:ring-ember/60 focus:border-transparent transition"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleBuscarCierre}
-                      disabled={!fechaBusqueda || buscandoCierre}
-                      className="shrink-0 rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {buscandoCierre ? 'Buscando...' : 'Buscar'}
-                    </button>
-                  </div>
-                </section>
+                  <ConsultaRangoCard
+                    titulo="Ventas por período"
+                    onConsultar={(desde, hasta) => getVentasPorPeriodoRequest(restauranteId, desde, hasta)}
+                  >
+                    {(resultado) => (
+                      <div className="grid grid-cols-2 gap-3">
+                        <EstadisticaInline etiqueta="Facturas" valor={resultado.cantidadFacturas} />
+                        <EstadisticaInline etiqueta="Subtotal" valor={formatearColones(Number(resultado.subtotal))} />
+                        <EstadisticaInline
+                          etiqueta="Impuesto de servicio"
+                          valor={formatearColones(Number(resultado.totalServicio))}
+                        />
+                        <EstadisticaInline
+                          etiqueta="Total neto"
+                          valor={formatearColones(Number(resultado.totalNeto))}
+                        />
+                        <div className="col-span-2">
+                          <EstadisticaInline
+                            etiqueta="Ingreso real"
+                            valor={formatearColones(Number(resultado.ingresoReal))}
+                            destacada
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </ConsultaRangoCard>
 
-                <section className="rounded-xl border border-line bg-surface p-5">
-                  <h2 className="text-sm font-semibold text-ink tracking-tight">Buscar factura por número</h2>
-                  <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-                    <input
-                      type="number"
-                      min="1"
-                      inputMode="numeric"
-                      placeholder="Ej. 342"
-                      value={numeroBusqueda}
-                      onChange={(event) => setNumeroBusqueda(event.target.value)}
-                      className="w-full flex-1 rounded-lg border border-line bg-surface-2 px-3 py-2.5 text-sm text-ink placeholder-muted focus:outline-none focus:ring-2 focus:ring-ember/60 focus:border-transparent transition"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleBuscarFactura}
-                      disabled={!numeroBusqueda.trim() || buscandoFactura}
-                      className="shrink-0 rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {buscandoFactura ? 'Buscando...' : 'Buscar'}
-                    </button>
-                  </div>
-                </section>
+                  <ConsultaRangoCard
+                    titulo="Impuesto de servicio"
+                    onConsultar={(desde, hasta) => getServicioPorPeriodoRequest(restauranteId, desde, hasta)}
+                  >
+                    {(resultado) => (
+                      <div className="grid grid-cols-2 gap-3">
+                        <EstadisticaInline
+                          etiqueta="Total de servicio"
+                          valor={formatearColones(Number(resultado.totalServicio))}
+                          destacada
+                        />
+                        <EstadisticaInline etiqueta="Facturas" valor={resultado.cantidadFacturas} />
+                      </div>
+                    )}
+                  </ConsultaRangoCard>
+
+                  <ConsultaRangoCard
+                    titulo="Productos vendidos por categoría"
+                    onConsultar={(desde, hasta) => getProductosPorCategoriaRequest(restauranteId, desde, hasta)}
+                  >
+                    {(resultado) =>
+                      resultado.length === 0 ? (
+                        <p className="text-sm text-muted">No se vendieron productos en este período.</p>
+                      ) : (
+                        <div className="space-y-4">
+                          {resultado.map((grupo) => (
+                            <div key={grupo.categoria}>
+                              <h3 className="text-xs font-semibold uppercase tracking-wider text-ember">
+                                {grupo.categoria}
+                              </h3>
+                              <ul className="mt-2 space-y-1.5">
+                                {grupo.productos.map((producto) => (
+                                  <li
+                                    key={producto.producto}
+                                    className="flex items-center justify-between gap-3 text-sm"
+                                  >
+                                    <span className="min-w-0 truncate text-ink">
+                                      {producto.producto} <span className="text-muted">×{producto.cantidad}</span>
+                                    </span>
+                                    <span className="shrink-0 font-semibold text-ink">
+                                      {formatearColones(Number(producto.monto))}
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    }
+                  </ConsultaRangoCard>
+
+                  <ConsultaRangoCard
+                    titulo="Consecutivo de facturas"
+                    onConsultar={(desde, hasta) => getConsecutivoFacturasRequest(restauranteId, desde, hasta)}
+                  >
+                    {(resultado) =>
+                      resultado.cantidad === 0 ? (
+                        <p className="text-sm text-muted">No hay facturas en este período.</p>
+                      ) : (
+                        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                          <span className="text-lg font-bold text-ink">
+                            Del #{String(resultado.primera).padStart(3, '0')} al #
+                            {String(resultado.ultima).padStart(3, '0')}
+                          </span>
+                          <span className="text-sm text-muted">· {resultado.cantidad} facturas</span>
+                        </div>
+                      )
+                    }
+                  </ConsultaRangoCard>
+                </div>
               </div>
             )}
           </>

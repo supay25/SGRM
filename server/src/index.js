@@ -11,6 +11,8 @@ import ordenRoutes from './routes/orden.routes.js';
 import facturaRoutes from './routes/factura.routes.js';
 import cierreRoutes from './routes/cierres.routes.js';
 import ownerRoutes from './routes/owner.routes/owner.routes.js'
+import reportesRoutes from './routes/reportes.routes.js';
+import restauranteRoutes from './routes/restaurante.routes.js';
 
 // Configurar variables de entorno
 dotenv.config();
@@ -33,7 +35,8 @@ app.use('/api/ordenes', ordenRoutes);
 app.use('/api/facturas', facturaRoutes);
 app.use('/api/cierres', cierreRoutes);
 app.use('/api/owner', ownerRoutes);
-
+app.use('/api/reportes', reportesRoutes);
+app.use('/api/restaurante', restauranteRoutes);
 
 // Ruta de prueba
 app.get('/api/health', (req, res) => {

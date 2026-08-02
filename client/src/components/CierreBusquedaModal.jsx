@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
 import { formatearColones } from '../utils/formato'
+import BotonCerrarX from './BotonCerrarX'
+import BotonImprimir from './BotonImprimir'
 
 function formatearFecha(fecha) {
   return new Date(`${fecha}T12:00:00`).toLocaleDateString('es-CR', {
@@ -19,6 +21,10 @@ export default function CierreBusquedaModal({ fechaBuscada, cierre, onCerrar }) 
     return () => document.removeEventListener('keydown', handleEsc)
   }, [onCerrar])
 
+  function handleImprimir() {
+    // TODO: impresión térmica pendiente
+  }
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm px-4"
@@ -26,13 +32,14 @@ export default function CierreBusquedaModal({ fechaBuscada, cierre, onCerrar }) 
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-sm rounded-2xl border border-line bg-surface shadow-2xl"
+        className="flex w-full max-w-sm max-h-[85vh] flex-col rounded-2xl border border-line bg-surface shadow-2xl"
       >
-        <div className="px-6 py-5 border-b border-line">
+        <div className="flex items-start justify-between gap-3 border-b border-line px-6 py-5">
           <h2 className="text-lg font-semibold text-ink tracking-tight capitalize">{formatearFecha(fechaBuscada)}</h2>
+          <BotonCerrarX onClick={onCerrar} />
         </div>
 
-        <div className="px-6 py-5">
+        <div className="overflow-y-auto px-6 py-5">
           {cierre ? (
             <div className="space-y-1.5 text-sm">
               <div className="flex justify-between text-muted">
@@ -62,7 +69,8 @@ export default function CierreBusquedaModal({ fechaBuscada, cierre, onCerrar }) 
           )}
         </div>
 
-        <div className="flex justify-end gap-3 px-6 pb-6">
+        <div className="flex justify-end gap-3 border-t border-line px-6 py-5">
+          <BotonImprimir onClick={handleImprimir} />
           <button
             type="button"
             onClick={onCerrar}

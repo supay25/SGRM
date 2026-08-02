@@ -4,12 +4,26 @@ import Navbar from '../components/navbar'
 import ResumenTarjeta from '../components/ResumenTarjeta'
 import ConfirmarCierreModal from '../components/ConfirmarCierreModal'
 import HistorialCierreCard from '../components/HistorialCierreCard'
+import FacturaCard from '../components/FacturaCard'
+import FacturaDetallePanel from '../components/FacturaDetallePanel'
 import useCierreCaja from '../hooks/useCierreCaja'
+import useFacturas from '../hooks/useFacturas'
 import { formatearColones } from '../utils/formato'
 
 export default function CierreCaja() {
   const navigate = useNavigate()
-  const { cargando, diaCerrado, resumenHoy, anulados, historial, cerrando, cerrarCaja } = useCierreCaja()
+  const { cargando, diaCerrado, resumenHoy, anulados, historial, cerrando, cerrarCaja, recargarResumen } =
+    useCierreCaja()
+  const {
+    cargando: cargandoFacturas,
+    facturas,
+    facturaSeleccionadaId,
+    detalle,
+    cargandoDetalle,
+    seleccionarFactura,
+    cerrarDetalle,
+    anularFactura,
+  } = useFacturas()
   const [modalAbierto, setModalAbierto] = useState(false)
 
   function handleLogout() {
@@ -19,10 +33,30 @@ export default function CierreCaja() {
     localStorage.removeItem('user')
     navigate('/login')
   }
- 
+
   async function handleConfirmarCierre() {
     await cerrarCaja()
     setModalAbierto(false)
+  }
+
+  async function handleAnular(factura) {
+    // TODO: reemplazar por confirmación propia del sistema de diseño
+    const confirmado = window.confirm(
+      `¿Anular la factura #${String(factura.numeroFactura).padStart(3, '0')}? Esta acción no se puede deshacer.`
+    )
+    if (!confirmado) return
+    await anularFactura(factura.id)
+    await recargarResumen()
+  }
+
+  function handleEditarCliente(factura) {
+    // TODO: editar cliente pendiente
+    console.log('Editar cliente de la factura', factura.id)
+  }
+
+  function handleImprimir(factura) {
+    // TODO: impresión térmica pendiente
+    console.log('Imprimir factura', factura.id)
   }
 
   const rangoFacturas =
@@ -52,75 +86,113 @@ export default function CierreCaja() {
               <p className="mt-1 text-sm text-muted">Resumen en vivo de lo facturado hoy.</p>
             )}
 
-            <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-5">
-              {/* Columna principal: cifras del día */}
-              <div className="lg:col-span-3">
-                <div className="grid grid-cols-2 gap-4">
-                  <ResumenTarjeta etiqueta="Facturas" valor={resumenHoy.cantidad} />
-                  <ResumenTarjeta etiqueta="Consecutivos" valor={rangoFacturas} />
-                  <ResumenTarjeta etiqueta="Total neto" valor={formatearColones(resumenHoy.totalNeto)} />
-                  <ResumenTarjeta
-                    etiqueta="Impuesto de servicio"
-                    valor={formatearColones(resumenHoy.totalServicio)}
-                  />
-                </div>
-
-                <div className="mt-4">
-                  <ResumenTarjeta
-                    etiqueta="Ingreso real"
-                    valor={formatearColones(resumenHoy.ingresoReal)}
-                    destacada
-                  />
-                </div>
-
-                {!diaCerrado && (
-                  <button
-                    type="button"
-                    onClick={() => setModalAbierto(true)}
-                    disabled={resumenHoy.cantidad === 0}
-                    className="mt-6 w-full rounded-xl bg-ember px-4 py-4 text-base font-bold text-orange-50 shadow-lg shadow-ember/25 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ember"
-                  >
-                    Cerrar caja del día
-                  </button>
-                )}
+            {/* ═══ ZONA 1: Resumen del día ═══ */}
+            <section className="mt-6">
+              <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                <ResumenTarjeta etiqueta="Facturas" valor={resumenHoy.cantidad} />
+                <ResumenTarjeta etiqueta="Consecutivos" valor={rangoFacturas} />
+                <ResumenTarjeta etiqueta="Ingreso real" valor={formatearColones(resumenHoy.ingresoReal)} />
+                <ResumenTarjeta
+                  etiqueta="Impuesto de servicio"
+                  valor={formatearColones(resumenHoy.totalServicio)}
+                />
               </div>
 
-              {/* Columna lateral: anulados + historial */}
-              <div className="space-y-8 lg:col-span-2 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto lg:pr-1">
-                {anulados.length > 0 && (
-                  <section>
-                    <h2 className="text-lg font-semibold text-ink tracking-tight">Productos anulados hoy</h2>
-                    <div className="mt-4 space-y-2">
-                      {anulados.map((anulado, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between gap-4 rounded-xl border border-line bg-surface px-5 py-3.5"
-                        >
-                          <div>
-                            <p className="text-base font-medium text-ink">{anulado.nombreProducto}</p>
-                            <p className="mt-0.5 text-sm text-muted">{anulado.nombreMesa}</p>
-                          </div>
-                          <span className="text-base font-semibold text-danger">×{anulado.cantidad}</span>
+              <div className="mt-4">
+                <ResumenTarjeta etiqueta="Total neto" valor={formatearColones(resumenHoy.totalNeto)} destacada />
+              </div>
+
+              {!diaCerrado && (
+                <button
+                  type="button"
+                  onClick={() => setModalAbierto(true)}
+                  disabled={resumenHoy.cantidad === 0}
+                  className="mt-6 w-full rounded-xl bg-ember px-4 py-4 text-base font-bold text-orange-50 shadow-lg shadow-ember/25 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ember"
+                >
+                  Cerrar caja del día
+                </button>
+              )}
+
+              {anulados.length > 0 && (
+                <div className="mt-8">
+                  <h2 className="text-lg font-semibold text-ink tracking-tight">Productos anulados hoy</h2>
+                  <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {anulados.map((anulado, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between gap-4 rounded-xl border border-line bg-surface px-5 py-3.5"
+                      >
+                        <div>
+                          <p className="text-base font-medium text-ink">{anulado.nombreProducto}</p>
+                          <p className="mt-0.5 text-sm text-muted">{anulado.nombreMesa}</p>
                         </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
+                        <span className="text-base font-semibold text-danger">×{anulado.cantidad}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
 
-                <section>
-                  <h2 className="text-lg font-semibold text-ink tracking-tight">Cierres anteriores</h2>
-                  {historial.length === 0 ? (
-                    <p className="mt-3 text-sm text-muted">Todavía no hay cierres registrados.</p>
-                  ) : (
-                    <div className="mt-4 space-y-3">
-                      {historial.map((cierre) => (
-                        <HistorialCierreCard key={cierre.id} cierre={cierre} />
+            {/* ═══ ZONA 2: Facturas del día ═══ */}
+            <section className="mt-10">
+              <h2 className="text-xl font-bold text-ink tracking-tight">Facturas del día</h2>
+
+              {cargandoFacturas ? (
+                <div className="mt-6 text-center text-muted">Cargando facturas...</div>
+              ) : facturas.length === 0 ? (
+                <div className="mt-4 rounded-xl border border-dashed border-line py-16 text-center">
+                  <span className="mb-3 block text-4xl">🧾</span>
+                  <p className="text-sm text-muted">Todavía no hay facturas registradas hoy.</p>
+                </div>
+              ) : (
+                <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-5">
+                  <div className="lg:col-span-2">
+                    <div className="max-h-100 space-y-3 overflow-y-auto pr-1 lg:max-h-150">
+                      {facturas.map((factura) => (
+                        <FacturaCard
+                          key={factura.id}
+                          factura={factura}
+                          seleccionada={factura.id === facturaSeleccionadaId}
+                          onAbrir={seleccionarFactura}
+                        />
                       ))}
                     </div>
-                  )}
-                </section>
-              </div>
-            </div>
+                  </div>
+
+                  <div className="lg:col-span-3">
+                    {facturaSeleccionadaId === null ? (
+                      <div className="flex h-full min-h-60 items-center justify-center rounded-xl border border-dashed border-line text-center">
+                        <p className="px-6 text-sm text-muted">Selecciona una factura para ver el detalle.</p>
+                      </div>
+                    ) : (
+                      <FacturaDetallePanel
+                        factura={detalle}
+                        cargando={cargandoDetalle}
+                        onVolver={cerrarDetalle}
+                        onAnular={handleAnular}
+                        onEditarCliente={handleEditarCliente}
+                        onImprimir={handleImprimir}
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* ═══ ZONA 3: Cierres anteriores ═══ */}
+            <section className="mt-10">
+              <h2 className="text-lg font-semibold text-ink tracking-tight">Cierres anteriores</h2>
+              {historial.length === 0 ? (
+                <p className="mt-3 text-sm text-muted">Todavía no hay cierres registrados.</p>
+              ) : (
+                <div className="mt-4 space-y-3">
+                  {historial.map((cierre) => (
+                    <HistorialCierreCard key={cierre.id} cierre={cierre} />
+                  ))}
+                </div>
+              )}
+            </section>
           </>
         )}
       </main>

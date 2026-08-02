@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
 import { formatearColones } from '../utils/formato'
+import BotonCerrarX from './BotonCerrarX'
+import BotonImprimir from './BotonImprimir'
 
 function formatearNumero(numeroFactura) {
   return `#${String(numeroFactura).padStart(3, '0')}`
@@ -23,6 +25,10 @@ export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar 
     return () => document.removeEventListener('keydown', handleEsc)
   }, [onCerrar])
 
+  function handleImprimir() {
+    // TODO: impresión térmica pendiente
+  }
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm px-4"
@@ -30,23 +36,26 @@ export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar 
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-sm max-h-[85vh] overflow-y-auto rounded-2xl border border-line bg-surface shadow-2xl"
+        className="flex w-full max-w-sm max-h-[85vh] flex-col rounded-2xl border border-line bg-surface shadow-2xl"
       >
         {factura ? (
           <>
-            <div className="px-6 py-5 border-b border-line">
-              <span className="inline-block rounded-lg bg-surface-2 px-3 py-1.5 text-lg font-extrabold tracking-tight text-ember">
-                {formatearNumero(factura.numeroFactura)}
-              </span>
-              <h2 className="mt-3 text-xl font-bold tracking-tight text-ink">{factura.nombreMesa}</h2>
-              <p className="mt-1 text-sm text-muted">
-                {factura.seccion.nombre}
-                {' · '}
-                {formatearFechaHora(factura.fecha)}
-              </p>
+            <div className="flex items-start justify-between gap-3 border-b border-line px-6 py-5">
+              <div className="min-w-0">
+                <span className="inline-block rounded-lg bg-surface-2 px-3 py-1.5 text-lg font-extrabold tracking-tight text-ember">
+                  {formatearNumero(factura.numeroFactura)}
+                </span>
+                <h2 className="mt-3 text-xl font-bold tracking-tight text-ink">{factura.nombreMesa}</h2>
+                <p className="mt-1 text-sm text-muted">
+                  {factura.seccion.nombre}
+                  {' · '}
+                  {formatearFechaHora(factura.fecha)}
+                </p>
+              </div>
+              <BotonCerrarX onClick={onCerrar} />
             </div>
 
-            <div className="px-6 py-4">
+            <div className="overflow-y-auto px-6 py-4">
               {factura.items.map((item) => {
                 const subtotalLinea = item.cantidad * Number(item.precioUnitario)
                 return (
@@ -93,16 +102,18 @@ export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar 
           </>
         ) : (
           <>
-            <div className="px-6 py-5 border-b border-line">
+            <div className="flex items-start justify-between gap-3 border-b border-line px-6 py-5">
               <h2 className="text-lg font-semibold text-ink tracking-tight">Factura {formatearNumero(numeroBuscado)}</h2>
+              <BotonCerrarX onClick={onCerrar} />
             </div>
-            <div className="px-6 py-5">
+            <div className="overflow-y-auto px-6 py-5">
               <p className="text-sm text-muted">No se encontró ninguna factura con ese número.</p>
             </div>
           </>
         )}
 
-        <div className="flex justify-end gap-3 px-6 pb-6">
+        <div className="flex justify-end gap-3 border-t border-line px-6 py-5">
+          <BotonImprimir onClick={handleImprimir} />
           <button
             type="button"
             onClick={onCerrar}

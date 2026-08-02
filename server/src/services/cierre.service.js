@@ -97,21 +97,23 @@ export const listarCierres = async (restaurantId) => {
 
 
 
-
-
 export const resumenDelDia = async (restaurantId) => {
   const inicioDia = new Date();
   inicioDia.setHours(0, 0, 0, 0);
   const finDia = new Date();
   finDia.setHours(23, 59, 59, 999);
 
+  // Todas las del día (para conteo y rango de consecutivos)
   const facturas = await prisma.factura.findMany({
-    where: { restaurantId, anulada: false, fecha: { gte: inicioDia, lte: finDia } },
+    where: { restaurantId, fecha: { gte: inicioDia, lte: finDia } },
     orderBy: { numeroFactura: 'asc' },
   });
 
-  const totalNeto = facturas.reduce((acc, f) => acc.plus(f.montoNeto), new Prisma.Decimal(0));
-  const totalServicio = facturas.reduce((acc, f) => acc.plus(f.montoServicio), new Prisma.Decimal(0));
+  // Solo activas para los montos
+  const activas = facturas.filter((f) => !f.anulada);
+
+  const totalNeto = activas.reduce((acc, f) => acc.plus(f.montoNeto), new Prisma.Decimal(0));
+  const totalServicio = activas.reduce((acc, f) => acc.plus(f.montoServicio), new Prisma.Decimal(0));
   const ingresoReal = totalNeto.minus(totalServicio);
 
   const anulados = await prisma.itemAnulado.findMany({
@@ -123,8 +125,8 @@ export const resumenDelDia = async (restaurantId) => {
   });
 
   return {
-    cantidad: facturas.length,
-    primeraFactura: facturas[0]?.numeroFactura ?? null,
+    cantidad: facturas.length,                            
+    primeraFactura: facturas[0]?.numeroFactura ?? null,   
     ultimaFactura: facturas[facturas.length - 1]?.numeroFactura ?? null,
     totalNeto,
     totalServicio,

@@ -26,21 +26,27 @@ export const crearFactura = async (restaurantId, mesaId) => {
 
   const seccion = orden.mesa.seccion;
 
-  // 3. Subtotal con Decimal (nunca operar Decimal con +/* normales)
-  const subtotal = orden.items.reduce(
+
+  const precioTotal = orden.items.reduce(
     (acc, item) => acc.plus(item.precioUnitario.times(item.cantidad)),
     new Prisma.Decimal(0)
   );
 
   const montoServicio = seccion.aplicaServicio
-    ? subtotal.times(seccion.porcentajeServicio).dividedBy(100)
+    ? precioTotal.times(seccion.porcentajeServicio).dividedBy(100)
     : new Prisma.Decimal(0);
 
+  
   const montoComision = seccion.aplicaComision
-    ? subtotal.times(seccion.porcentajeComision).dividedBy(100)
+    ? precioTotal.times(seccion.porcentajeComision).dividedBy(100)
     : new Prisma.Decimal(0);
 
-  const montoNeto = subtotal.minus(montoComision);
+
+  const total = precioTotal.minus(montoComision);
+
+  // subtotal = la base, total menos el servicio (para el desglose del recibo)
+  const subtotal = total.minus(montoServicio);
+  const montoNeto = total;
 
   // 4. Consecutivo por restaurante
   const ultimaFactura = await prisma.factura.findFirst({
@@ -57,10 +63,11 @@ export const crearFactura = async (restaurantId, mesaId) => {
         nombreMesa: orden.mesa.nombre,
         seccionId: seccion.id,
         restaurantId,
+        total,            
         subtotal,
         montoServicio,
         montoComision,
-        montoNeto,
+        montoNeto,        
         items: {
           create: orden.items.map((item) => ({
             productoId: item.productoId,
@@ -93,8 +100,8 @@ export const crearFactura = async (restaurantId, mesaId) => {
 export const listarFacturas = async (restaurantId) => {
   const inicioDia = new Date();
   const finDia = new Date();
-  inicioDia.setHours(0,0,0,0);
-  finDia.setHours(23,59,59, 999);
+  inicioDia.setHours(0, 0, 0, 0);
+  finDia.setHours(23, 59, 59, 999);
   return await prisma.factura.findMany({
     where: {
       restaurantId,
@@ -130,7 +137,7 @@ export const anularFactura = async (restaurantId, facturaId) => {
       anulada: true,
     },
   });
-}; 
+};
 
 
 

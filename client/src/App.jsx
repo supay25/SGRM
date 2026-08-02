@@ -2,9 +2,9 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Home from './pages/Home'
 import OrdenMesa from './pages/OrdenMesa'
-import Menu from './pages/Menu'
-import Facturas from './pages/Facturas'
+import Parametros from './pages/Parametros'
 import CierreCaja from './pages/CierreCaja'
+import Reportes from './pages/Reportes'
 import RutaProtegida from './components/RutaProtegida'
 import Dashboard from './pages/Dashboard'
 import OwnerDashboard from './pages/OwnerDashboard'
@@ -26,19 +26,19 @@ function App() {
           <OrdenMesa />
         </RutaProtegida>
       } />
-      <Route path="/home/menu" element={
+      <Route path="/home/parametros" element={
         <RutaProtegida>
-          <Menu />
-        </RutaProtegida>
-      } />
-      <Route path="/home/facturas" element={
-        <RutaProtegida>
-          <Facturas />
+          <Parametros />
         </RutaProtegida>
       } />
       <Route path="/home/cierre" element={
         <RutaProtegida>
           <CierreCaja />
+        </RutaProtegida>
+      } />
+      <Route path="/home/reportes" element={
+        <RutaProtegida>
+          <Reportes />
         </RutaProtegida>
       } />
       <Route path="/Dashboard" element={

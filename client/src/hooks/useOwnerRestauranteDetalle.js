@@ -6,7 +6,10 @@ import {
   getCierresRestauranteRequest,
   buscarFacturaPorNumeroRequest,
   buscarCierrePorFechaRequest,
-
+  getReporteVentasRequest,
+  getReporteServicioRequest,
+  getReporteProductosRequest,
+  getReporteConsecutivoRequest,
 } from '../api/owner.api.js'
 
 export default function useOwnerRestauranteDetalle(restauranteId) {
@@ -22,6 +25,22 @@ export default function useOwnerRestauranteDetalle(restauranteId) {
 
   const buscarCierrePorFecha = async (fecha) => {
     return await buscarCierrePorFechaRequest(restauranteId, fecha)
+  }
+
+  const consultarVentas = async (desde, hasta) => {
+    return await getReporteVentasRequest(restauranteId, desde, hasta)
+  }
+
+  const consultarServicio = async (desde, hasta) => {
+    return await getReporteServicioRequest(restauranteId, desde, hasta)
+  }
+
+  const consultarProductos = async (desde, hasta) => {
+    return await getReporteProductosRequest(restauranteId, desde, hasta)
+  }
+
+  const consultarConsecutivo = async (desde, hasta) => {
+    return await getReporteConsecutivoRequest(restauranteId, desde, hasta)
   }
 
   useEffect(() => {
@@ -46,7 +65,17 @@ export default function useOwnerRestauranteDetalle(restauranteId) {
     cargar()
   }, [restauranteId])
 
-  return { cargando, restaurante, resumen, metricas, cierres, buscarFacturaPorNumero, buscarCierrePorFecha}
+  return {
+    cargando,
+    restaurante,
+    resumen,
+    metricas,
+    cierres,
+    buscarFacturaPorNumero,
+    buscarCierrePorFecha,
+    consultarVentas,
+    consultarServicio,
+    consultarProductos,
+    consultarConsecutivo,
+  }
 }
-
-

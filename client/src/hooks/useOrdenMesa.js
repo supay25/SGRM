@@ -19,7 +19,7 @@ export default function useOrdenMesa(mesaId) {
 
 
 
-  
+
   useEffect(() => {
     const cargar = async () => {
       try {
@@ -121,15 +121,19 @@ export default function useOrdenMesa(mesaId) {
   }, [])
 
 
-  const subtotal = useMemo(
+
+  const total = useMemo(
     () => lineas.reduce((acc, linea) => acc + linea.precio * linea.cantidad, 0),
     [lineas]
   )
+
   const montoServicio = useMemo(
-    () => (seccion?.aplicaServicio ? Math.round(subtotal * (Number(seccion.porcentajeServicio) / 100)) : 0),
-    [subtotal, seccion]
+    () => (seccion?.aplicaServicio ? Math.round(total * (Number(seccion.porcentajeServicio) / 100)) : 0),
+    [total, seccion]
   )
-  const total = subtotal + montoServicio
+
+  
+  const subtotal = total - montoServicio
 
   const ingresarOrden = useCallback(async () => {
     if (lineas.length === 0) return

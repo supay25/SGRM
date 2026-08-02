@@ -33,25 +33,27 @@ enum UserRole {
 }
 
 model Restaurant {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  name      String
-  email     String   @unique
-  password  String
-  phone     String?
-  address   String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id])
+  name            String
+  email           String   @unique
+  password        String
+  phone           String?
+  address         String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  cedulaJuridica  String?
+  tipoCambioDolar Decimal  @default(0) @db.Decimal(10, 2)
 
-  categorias Categoria[]
-  productos  Producto[]
-  secciones  Seccion[]
-  mesas      Mesa[]
-  ordenes    Orden[]
-  facturas   Factura[]
-  cierres    Cierre[]
+  categorias    Categoria[]
+  productos     Producto[]
+  secciones     Seccion[]
+  mesas         Mesa[]
+  ordenes       Orden[]
+  facturas      Factura[]
+  cierres       Cierre[]
   itemsAnulados ItemAnulado[]
 }
 
@@ -70,18 +72,18 @@ model Categoria {
 }
 
 model Producto {
-  id           Int        @id @default(autoincrement())
-  nombre       String
-  precio       Decimal    @db.Decimal(10, 2)
-  categoriaId  Int
-  categoria    Categoria  @relation(fields: [categoriaId], references: [id])
-  restaurantId Int
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  activo  Boolean  @default(true)
-  ordenItems   OrdenItem[]
-  facturaItems FacturaItem[]
+  id            Int           @id @default(autoincrement())
+  nombre        String
+  precio        Decimal       @db.Decimal(10, 2)
+  categoriaId   Int
+  categoria     Categoria     @relation(fields: [categoriaId], references: [id])
+  restaurantId  Int
+  restaurant    Restaurant    @relation(fields: [restaurantId], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  activo        Boolean       @default(true)
+  ordenItems    OrdenItem[]
+  facturaItems  FacturaItem[]
   itemsAnulados ItemAnulado[]
 }
 
@@ -133,7 +135,6 @@ model Orden {
   items        OrdenItem[]
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
-  
 }
 
 model OrdenItem {
@@ -145,20 +146,21 @@ model OrdenItem {
   cantidad       Int
   precioUnitario Decimal  @db.Decimal(10, 2)
   createdAt      DateTime @default(now())
+
   @@unique([ordenId, productoId])
 }
 
 model ItemAnulado {
-  id              Int         @id @default(autoincrement())
-  restaurantId    Int
-  restaurant      Restaurant  @relation(fields: [restaurantId], references: [id])
-  nombreMesa      String
-  productoId      Int
-  producto        Producto    @relation(fields: [productoId], references: [id])
-  nombreProducto  String
-  cantidad        Int
-  precioUnitario  Decimal     @db.Decimal(10, 2)
-  fecha           DateTime    @default(now())
+  id             Int        @id @default(autoincrement())
+  restaurantId   Int
+  restaurant     Restaurant @relation(fields: [restaurantId], references: [id])
+  nombreMesa     String
+  productoId     Int
+  producto       Producto   @relation(fields: [productoId], references: [id])
+  nombreProducto String
+  cantidad       Int
+  precioUnitario Decimal    @db.Decimal(10, 2)
+  fecha          DateTime   @default(now())
 }
 
 // ==========================================
@@ -178,9 +180,11 @@ model Factura {
   montoServicio Decimal       @default(0) @db.Decimal(10, 2)
   montoComision Decimal       @default(0) @db.Decimal(10, 2)
   montoNeto     Decimal       @db.Decimal(10, 2)
+  total  Decimal  @db.Decimal(10, 2)  @default(0)
   fecha         DateTime      @default(now())
   createdAt     DateTime      @default(now())
   anulada       Boolean       @default(false)
+
   @@unique([restaurantId, numeroFactura])
 }
 
@@ -213,6 +217,3 @@ model Cierre {
 
   @@unique([restaurantId, fecha])
 }
-
-
-
