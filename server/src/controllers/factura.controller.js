@@ -1,10 +1,10 @@
-import { crearFactura, listarFacturas , anularFactura, obtenerFactura} from '../services/factura.service.js';
+import { crearFactura, listarFacturas ,editarClienteFactura , anularFactura, facturarParcial, obtenerFactura} from '../services/factura.service.js';
 
 export const crear = async (req, res) => {
   try {
     const restaurantId = req.usuario.id;
-    const { mesaId } = req.body;
-    const factura = await crearFactura(restaurantId, Number(mesaId));
+    const { mesaId, descuento, nombreCliente } = req.body;
+    const factura = await crearFactura(restaurantId, Number(mesaId), Number(descuento) || 0, nombreCliente);
     res.status(201).json(factura);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -42,6 +42,33 @@ export const obtener = async (req, res) => {
     const { id } = req.params;
     const factura = await obtenerFactura(restaurantId, Number(id));
     res.status(200).json(factura);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
+export const editarCliente = async (req, res) => {
+  try {
+    const restaurantId = req.usuario.id;
+    const { id } = req.params;
+    const { nombreCliente } = req.body;
+    const factura = await editarClienteFactura(restaurantId, Number(id), nombreCliente);
+    res.status(200).json(factura);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
+
+
+export const facturarDividido = async (req, res) => {
+  try {
+    const restaurantId = req.usuario.id;
+    const { mesaId, items, descuento, nombreCliente } = req.body;
+    const factura = await facturarParcial(restaurantId, Number(mesaId), items, Number(descuento) || 0, nombreCliente);
+    res.status(201).json(factura);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

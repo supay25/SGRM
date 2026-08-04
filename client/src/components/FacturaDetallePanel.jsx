@@ -44,6 +44,9 @@ export default function FacturaDetallePanel({ factura, cargando, onVolver, onAnu
               {' · '}
               {formatearFechaHora(factura.fecha)}
             </p>
+            <p className="mt-1 text-sm text-muted">
+              Cliente: <span className="font-medium text-ink">{factura.nombreCliente}</span>
+            </p>
           </div>
 
           {factura.anulada && (
@@ -105,13 +108,16 @@ export default function FacturaDetallePanel({ factura, cargando, onVolver, onAnu
             Anular factura
           </button>
         )}
-        <button
-          type="button"
-          onClick={() => onEditarCliente(factura)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-muted transition hover:bg-surface-2 hover:text-ink active:scale-[0.98]"
-        >
-          Editar cliente
-        </button>
+        {/* Una factura anulada ya no admite cambios de cliente. */}
+        {!factura.anulada && (
+          <button
+            type="button"
+            onClick={() => onEditarCliente(factura)}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-muted transition hover:bg-surface-2 hover:text-ink active:scale-[0.98]"
+          >
+            Editar cliente
+          </button>
+        )}
         <button
           type="button"
           onClick={() => onImprimir(factura)}

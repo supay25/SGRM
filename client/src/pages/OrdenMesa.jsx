@@ -1,14 +1,21 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import CategoriaTabs from '../components/CategoriaTabs'
 import ProductoCard from '../components/ProductoCard'
 import OrdenLinea from '../components/OrdenLinea'
+import ConfirmarFacturaModal from '../components/ConfirmarFacturaModal'
+import DividirCuentaModal from '../components/DividirCuentaModal'
 import useOrdenMesa from '../hooks/useOrdenMesa'
 import { formatearColones } from '../utils/formato'
 
 export default function OrdenMesa() {
   const { mesaId } = useParams()
   const navigate = useNavigate()
- 
+  // null (cerrado) | 'confirmar' | 'dividir'
+  const [vistaFactura, setVistaFactura] = useState(null)
+  // null = se factura toda la orden; si no, son las líneas elegidas en el modal de dividir.
+  const [itemsDivididos, setItemsDivididos] = useState(null)
+
   const {
     cargando,
     mesa,
@@ -29,7 +36,10 @@ export default function OrdenMesa() {
     total,
     ingresarOrden,
     reiniciar,
+    reiniciando,
     facturar,
+    vaciarOrdenBackend,
+    debeVaciar,
   } = useOrdenMesa(mesaId)
 
   if (cargando || !mesa) {
@@ -43,6 +53,14 @@ export default function OrdenMesa() {
 
   const totalUnidades = lineas.reduce((acc, linea) => acc + linea.cantidad, 0)
   const hayProductos = lineas.length > 0
+
+  // Lo que se va a cobrar en esta factura: la orden completa o solo la sub-cuenta elegida.
+  const itemsAFacturar = itemsDivididos ?? lineas
+
+  function cerrarFacturacion() {
+    setVistaFactura(null)
+    setItemsDivididos(null)
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-page md:h-screen md:overflow-hidden md:flex-row">
@@ -106,9 +124,11 @@ export default function OrdenMesa() {
             <button
               type="button"
               onClick={reiniciar}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-line px-4 py-3 text-sm font-semibold text-muted transition hover:bg-surface-2 hover:text-ink active:scale-[0.98]"
+              disabled={reiniciando}
+              title="Descarta los cambios no ingresados y vuelve a lo guardado"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-line px-4 py-3 text-sm font-semibold text-muted transition hover:bg-surface-2 hover:text-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted"
             >
-              <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+              <svg viewBox="0 0 20 20" fill="currentColor" className={`h-4 w-4 ${reiniciando ? 'animate-spin' : ''}`}>
                 <path
                   fillRule="evenodd"
                   d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 002.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0112.88 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z"
@@ -118,19 +138,33 @@ export default function OrdenMesa() {
               Reiniciar
             </button>
 
-            <button
-              type="button"
-              onClick={ingresarOrden}
-              disabled={!hayProductos}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-ember px-4 py-3 text-sm font-semibold text-ember transition hover:bg-ember/10 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
-            >
-              Ingresar orden
-            </button>
+            {debeVaciar ? (
+              <button
+                type="button"
+                onClick={vaciarOrdenBackend}
+                title="La orden quedó vacía: libera la mesa"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-danger px-4 py-3 text-sm font-semibold text-danger transition hover:bg-danger/10 active:scale-[0.98]"
+              >
+                Vaciar orden
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={ingresarOrden}
+                disabled={!hayProductos}
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-ember px-4 py-3 text-sm font-semibold text-ember transition hover:bg-ember/10 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+              >
+                Ingresar orden
+              </button>
+            )}
           </div>
 
           <button
             type="button"
-            onClick={facturar}
+            onClick={() => {
+              setItemsDivididos(null)
+              setVistaFactura('confirmar')
+            }}
             disabled={!hayProductos}
             className="mt-3 w-full rounded-xl bg-ember px-4 py-4 text-base font-bold text-orange-50 shadow-lg shadow-ember/25 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ember"
           >
@@ -138,7 +172,6 @@ export default function OrdenMesa() {
           </button>
         </div>
       </aside>
-
       {/* COLUMNA DERECHA — el catálogo */}
       <main className="flex flex-1 flex-col md:h-full md:min-h-0">
         <div className="shrink-0 border-b border-line p-4">
@@ -163,6 +196,41 @@ export default function OrdenMesa() {
           </div>
         </div>
       </main>
+
+      {vistaFactura === 'confirmar' && (
+        <ConfirmarFacturaModal
+          // El precio bruto sale de estos items; el descuento se aplica dentro del modal.
+          itemsAFacturar={itemsAFacturar}
+          esDividida={itemsDivididos !== null}
+          seccion={seccion}
+          onDividir={() => setVistaFactura('dividir')}
+          onFacturar={async (datos) => {
+            // Si la orden queda con productos, `facturar` recarga y nos deja en la mesa.
+            await facturar({ items: itemsAFacturar, ...datos })
+            cerrarFacturacion()
+          }}
+          onCerrar={cerrarFacturacion}
+        />
+      )}
+
+      {vistaFactura === 'dividir' && (
+        <DividirCuentaModal
+          lineas={lineas}
+          // Al volver a dividir se mantiene lo que ya venía seleccionado.
+          seleccionInicial={Object.fromEntries(
+            (itemsDivididos ?? []).map((item) => [item.productoId, item.cantidad])
+          )}
+          onConfirmar={(items) => {
+            setItemsDivididos(items)
+            setVistaFactura('confirmar')
+          }}
+          onCancelar={() => {
+            // Cancelar vuelve al modal de confirmar con la orden completa.
+            setItemsDivididos(null)
+            setVistaFactura('confirmar')
+          }}
+        />
+      )}
     </div>
   )
 }

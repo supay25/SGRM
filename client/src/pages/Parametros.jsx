@@ -6,6 +6,7 @@ import DatosNegocioTab from '../components/DatosNegocioTab'
 import MenuTab from '../components/MenuTab'
 import SeccionesTab from '../components/SeccionesTab'
 import MesasTab from '../components/MesasTab'
+import ClientesTab from '../components/ClientesTab'
 
 export default function Parametros() {
   const navigate = useNavigate()
@@ -37,6 +38,7 @@ export default function Parametros() {
           {tabActivo === 'menu' && <MenuTab />}
           {tabActivo === 'secciones' && <SeccionesTab />}
           {tabActivo === 'mesas' && <MesasTab />}
+          {tabActivo === 'clientes' && <ClientesTab />}
         </div>
       </main>
     </div>

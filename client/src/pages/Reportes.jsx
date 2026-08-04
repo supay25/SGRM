@@ -4,6 +4,7 @@ import ConsultaRangoCard from '../components/ConsultaRangoCard'
 import EstadisticaInline from '../components/EstadisticaInline'
 import CierreBusquedaModal from '../components/CierreBusquedaModal'
 import FacturaBusquedaModal from '../components/FacturaBusquedaModal'
+import { editarClienteFacturaRequest } from '../api/cliente.api'
 import { formatearColones } from '../utils/formato'
 import Navbar from '../components/navbar'   
 
@@ -57,6 +58,16 @@ async function handleBuscarFactura() {
     setModalFacturaAbierto(true)
   } finally {
     setBuscandoFactura(false)
+  }
+}
+
+
+async function handleEditarClienteFactura(nombreCliente) {
+  try {
+    await editarClienteFacturaRequest(facturaEncontrada.id, nombreCliente)
+    setFacturaEncontrada((prev) => ({ ...prev, nombreCliente }))
+  } catch (error) {
+    alert(error.response?.data?.error || 'Error al editar el cliente')
   }
 }
 
@@ -223,6 +234,7 @@ async function handleBuscarFactura() {
         <FacturaBusquedaModal
           numeroBuscado={numeroFacturaBuscado}
           factura={facturaEncontrada}
+          onEditarCliente={handleEditarClienteFactura}
           onCerrar={() => setModalFacturaAbierto(false)}
         />
       )}

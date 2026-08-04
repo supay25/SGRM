@@ -13,6 +13,7 @@ import cierreRoutes from './routes/cierres.routes.js';
 import ownerRoutes from './routes/owner.routes/owner.routes.js'
 import reportesRoutes from './routes/reportes.routes.js';
 import restauranteRoutes from './routes/restaurante.routes.js';
+import clienteRoutes from './routes/cliente.routes.js';
 
 // Configurar variables de entorno
 dotenv.config();
@@ -37,7 +38,7 @@ app.use('/api/cierres', cierreRoutes);
 app.use('/api/owner', ownerRoutes);
 app.use('/api/reportes', reportesRoutes);
 app.use('/api/restaurante', restauranteRoutes);
-
+app.use('/api/clientes', clienteRoutes);
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'El servidor está vivo y respondiendo' });

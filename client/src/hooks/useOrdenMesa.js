@@ -16,32 +16,35 @@ export default function useOrdenMesa(mesaId) {
 
   const seccion = mesa?.seccion ?? null
 
-
-
-
+  // Carga la orden guardada del backend al estado local (o vacío si no hay)
+  const cargarOrden = useCallback(async () => {
+    const ordenData = await getOrdenDeMesa(mesaId)
+    if (ordenData && ordenData.items?.length > 0) {
+      setLineas(
+        ordenData.items.map((item) => ({
+          productoId: item.productoId,
+          nombre: item.producto.nombre,
+          precio: Number(item.precioUnitario),
+          cantidad: item.cantidad,
+        }))
+      )
+      setOrdenGuardadaEnBackend(true)
+    } else {
+      setLineas([])
+      setOrdenGuardadaEnBackend(false)
+    }
+  }, [mesaId])
 
   useEffect(() => {
     const cargar = async () => {
       try {
-        const [mesaData, productosData, ordenData] = await Promise.all([
+        const [mesaData, productosData] = await Promise.all([
           getMesa(mesaId),
           getProductos(),
-          getOrdenDeMesa(mesaId),
         ])
         setMesa(mesaData)
         setCatalogo(productosData)
-
-        if (ordenData && ordenData.items?.length > 0) {
-          setLineas(
-            ordenData.items.map((item) => ({
-              productoId: item.productoId,
-              nombre: item.producto.nombre,
-              precio: Number(item.precioUnitario),
-              cantidad: item.cantidad,
-            }))
-          )
-          setOrdenGuardadaEnBackend(true)
-        }
+        await cargarOrden()
       } catch (error) {
         console.error('Error al cargar la mesa:', error)
       } finally {
@@ -49,12 +52,7 @@ export default function useOrdenMesa(mesaId) {
       }
     }
     cargar()
-  }, [mesaId])
-
-
-
-
-
+  }, [mesaId, cargarOrden])
 
   const categorias = useMemo(() => {
     const vistas = new Map()
@@ -120,8 +118,6 @@ export default function useOrdenMesa(mesaId) {
     setLineas((prev) => prev.filter((linea) => linea.productoId !== productoId))
   }, [])
 
-
-
   const total = useMemo(
     () => lineas.reduce((acc, linea) => acc + linea.precio * linea.cantidad, 0),
     [lineas]
@@ -132,7 +128,6 @@ export default function useOrdenMesa(mesaId) {
     [total, seccion]
   )
 
-  
   const subtotal = total - montoServicio
 
   const ingresarOrden = useCallback(async () => {
@@ -147,20 +142,27 @@ export default function useOrdenMesa(mesaId) {
     }
   }, [lineas, mesaId, navigate])
 
+  // Reiniciar: descarta cambios locales y vuelve al último estado guardado en el backend
   const reiniciar = useCallback(async () => {
-    if (ordenGuardadaEnBackend) {
-      const confirmado = window.confirm('¿Seguro? Se perderá todo lo ingresado.')
-      if (!confirmado) return
-      try {
-        await reiniciarOrdenRequest(mesaId)
-        setOrdenGuardadaEnBackend(false)
-      } catch (error) {
-        alert(error.response?.data?.error || 'Error al reiniciar la orden')
-        return
-      }
+    try {
+      await cargarOrden()
+    } catch (error) {
+      alert(error.response?.data?.error || 'Error al reiniciar la orden')
     }
-    setLineas([])
-  }, [ordenGuardadaEnBackend, mesaId])
+  }, [cargarOrden])
+
+  // Vaciar orden: el borrador quedó vacío y había orden guardada → borra la orden en el backend y libera la mesa
+  const vaciarOrdenBackend = useCallback(async () => {
+    try {
+      await reiniciarOrdenRequest(mesaId)
+      navigate('/home')
+    } catch (error) {
+      alert(error.response?.data?.error || 'Error al vaciar la orden')
+    }
+  }, [mesaId, navigate])
+
+  // true cuando el borrador quedó vacío PERO había orden guardada → toca vaciar en backend
+  const debeVaciar = lineas.length === 0 && ordenGuardadaEnBackend
 
   const facturar = useCallback(async () => {
     if (lineas.length === 0) return
@@ -192,6 +194,8 @@ export default function useOrdenMesa(mesaId) {
     total,
     ingresarOrden,
     reiniciar,
+    vaciarOrdenBackend,
+    debeVaciar,
     facturar,
   }
 }

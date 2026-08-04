@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { formatearColones } from '../utils/formato'
 import BotonCerrarX from './BotonCerrarX'
 import BotonImprimir from './BotonImprimir'
+import SeleccionarClienteModal from './SeleccionarClienteModal'
 
 function formatearNumero(numeroFactura) {
   return `#${String(numeroFactura).padStart(3, '0')}`
@@ -16,20 +17,29 @@ function formatearFechaHora(fecha) {
   })
 }
 
-export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar }) {
+export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar, onEditarCliente }) {
+  const [modalClienteAbierto, setModalClienteAbierto] = useState(false)
+
   useEffect(() => {
     function handleEsc(event) {
-      if (event.key === 'Escape') onCerrar()
+      // El sub-modal de cliente maneja su propio Escape.
+      if (event.key === 'Escape' && !modalClienteAbierto) onCerrar()
     }
     document.addEventListener('keydown', handleEsc)
     return () => document.removeEventListener('keydown', handleEsc)
-  }, [onCerrar])
+  }, [onCerrar, modalClienteAbierto])
+
+  async function handleSeleccionarCliente(nombreCliente) {
+    await onEditarCliente(nombreCliente)
+    setModalClienteAbierto(false)
+  }
 
   function handleImprimir() {
     // TODO: impresión térmica pendiente
   }
 
   return (
+    <>
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm px-4"
       onClick={onCerrar}
@@ -50,6 +60,9 @@ export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar 
                   {factura.seccion.nombre}
                   {' · '}
                   {formatearFechaHora(factura.fecha)}
+                </p>
+                <p className="mt-1 text-sm text-muted">
+                  Cliente: <span className="font-medium text-ink">{factura.nombreCliente}</span>
                 </p>
               </div>
               <BotonCerrarX onClick={onCerrar} />
@@ -112,7 +125,17 @@ export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar 
           </>
         )}
 
-        <div className="flex justify-end gap-3 border-t border-line px-6 py-5">
+        <div className="flex flex-wrap justify-end gap-3 border-t border-line px-6 py-5">
+          {/* Caso típico: la factura se imprimió sin nombre y hay que asignarle el cliente. */}
+          {factura && !factura.anulada && (
+            <button
+              type="button"
+              onClick={() => setModalClienteAbierto(true)}
+              className="px-4 py-2.5 rounded-lg border border-line text-sm font-semibold text-muted hover:bg-surface-2 hover:text-ink transition active:scale-[0.98]"
+            >
+              Editar cliente
+            </button>
+          )}
           <BotonImprimir onClick={handleImprimir} />
           <button
             type="button"
@@ -124,5 +147,15 @@ export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar 
         </div>
       </div>
     </div>
+
+    {modalClienteAbierto && (
+      <SeleccionarClienteModal
+        nombreSeleccionado={factura.nombreCliente}
+        permitirNombreLibre
+        onSeleccionar={handleSeleccionarCliente}
+        onCerrar={() => setModalClienteAbierto(false)}
+      />
+    )}
+    </>
   )
 }

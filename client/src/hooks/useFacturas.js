@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { getFacturasRequest, getFacturaDetalleRequest, anularFacturaRequest } from '../api/facturas.api.js'
+import { editarClienteFacturaRequest } from '../api/cliente.api.js'
 
 export default function useFacturas() {
   const [facturas, setFacturas] = useState([])
@@ -83,6 +84,19 @@ export default function useFacturas() {
     [cargarFacturas, cargarDetalle, facturaSeleccionadaId]
   )
 
+  const editarCliente = useCallback(
+    async (facturaId, nombreCliente) => {
+      try {
+        await editarClienteFacturaRequest(facturaId, nombreCliente)
+        await cargarFacturas()
+        if (facturaId === facturaSeleccionadaId) await cargarDetalle(facturaId)
+      } catch (error) {
+        alert(error.response?.data?.error || 'Error al editar el cliente')
+      }
+    },
+    [cargarFacturas, cargarDetalle, facturaSeleccionadaId]
+  )
+
   return {
     cargando,
     facturas: facturasOrdenadas,
@@ -93,5 +107,6 @@ export default function useFacturas() {
     seleccionarFactura,
     cerrarDetalle,
     anularFactura,
+    editarCliente,
   }
 }

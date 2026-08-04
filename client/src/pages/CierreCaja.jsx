@@ -6,6 +6,7 @@ import ConfirmarCierreModal from '../components/ConfirmarCierreModal'
 import HistorialCierreCard from '../components/HistorialCierreCard'
 import FacturaCard from '../components/FacturaCard'
 import FacturaDetallePanel from '../components/FacturaDetallePanel'
+import SeleccionarClienteModal from '../components/SeleccionarClienteModal'
 import useCierreCaja from '../hooks/useCierreCaja'
 import useFacturas from '../hooks/useFacturas'
 import { formatearColones } from '../utils/formato'
@@ -23,8 +24,10 @@ export default function CierreCaja() {
     seleccionarFactura,
     cerrarDetalle,
     anularFactura,
+    editarCliente,
   } = useFacturas()
   const [modalAbierto, setModalAbierto] = useState(false)
+  const [facturaEditandoCliente, setFacturaEditandoCliente] = useState(null)
 
   function handleLogout() {
     // TODO: si se agrega endpoint de logout en el backend, invocarlo aquí antes de limpiar el storage
@@ -50,8 +53,12 @@ export default function CierreCaja() {
   }
 
   function handleEditarCliente(factura) {
-    // TODO: editar cliente pendiente
-    console.log('Editar cliente de la factura', factura.id)
+    setFacturaEditandoCliente(factura)
+  }
+
+  async function handleSeleccionarCliente(nombreCliente) {
+    await editarCliente(facturaEditandoCliente.id, nombreCliente)
+    setFacturaEditandoCliente(null)
   }
 
   function handleImprimir(factura) {
@@ -202,6 +209,15 @@ export default function CierreCaja() {
           cerrando={cerrando}
           onCancelar={() => setModalAbierto(false)}
           onConfirmar={handleConfirmarCierre}
+        />
+      )}
+
+      {facturaEditandoCliente && (
+        <SeleccionarClienteModal
+          nombreSeleccionado={facturaEditandoCliente.nombreCliente}
+          permitirNombreLibre
+          onSeleccionar={handleSeleccionarCliente}
+          onCerrar={() => setFacturaEditandoCliente(null)}
         />
       )}
     </div>

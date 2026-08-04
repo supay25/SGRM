@@ -3,6 +3,7 @@ const TABS = [
   { id: 'menu', etiqueta: 'Menú' },
   { id: 'secciones', etiqueta: 'Secciones' },
   { id: 'mesas', etiqueta: 'Mesas' },
+  { id: 'clientes', etiqueta: 'Clientes' },
 ]
 
 export default function ParametrosTabs({ tabActivo, onCambiarTab }) {
