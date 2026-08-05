@@ -3,15 +3,17 @@ import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/navbar'
 import SeccionTabs from '../components/SeccionTabs'
 import MesaCard from '../components/MesaCard'
+import MoverProductosModal from '../components/MoverProductosModal'
 import useMesas from '../hooks/useMesas.js'
 
 // El Home es solo operación: ver las mesas y entrar a tomar órdenes.
 // La administración de mesas vive en Parámetros → Mesas.
 export default function Home() {
   const navigate = useNavigate()
-  const { secciones, mesas } = useMesas()
+  const { secciones, mesas, recargar } = useMesas()
 
   const [seccionActivaId, setSeccionActivaId] = useState(secciones[0]?.id ?? null)
+  const [moverAbierto, setMoverAbierto] = useState(false)
 
   useEffect(() => {
     if (secciones.length > 0 && seccionActivaId === null) {
@@ -58,20 +60,49 @@ export default function Home() {
     navigate(`/home/mesas/${mesa.id}`)
   }
 
+  // Tras mover productos las mesas pueden cambiar de estado (LIBRE/OCUPADA),
+  // así que se recargan para reflejarlo en el grid.
+  async function handleProductosMovidos() {
+    setMoverAbierto(false)
+    await recargar()
+  }
+
   return (
     <div className="min-h-screen bg-page">
       <Navbar nombreRestaurante="La Buena Mesa" activeLink="home" onLogout={handleLogout} />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
-        <div>
-          <h1 className="text-2xl font-bold text-ink tracking-tight">Mesas</h1>
-          <p className="mt-1 text-sm text-muted">
-            {seccionActiva?.nombre}
-            {' · '}
-            <span className="text-success font-medium">{resumenSeccion.libres} libres</span>
-            {' · '}
-            <span className="text-danger font-medium">{resumenSeccion.ocupadas} ocupadas</span>
-          </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-ink tracking-tight">Mesas</h1>
+            <p className="mt-1 text-sm text-muted">
+              {seccionActiva?.nombre}
+              {' · '}
+              <span className="text-success font-medium">{resumenSeccion.libres} libres</span>
+              {' · '}
+              <span className="text-danger font-medium">{resumenSeccion.ocupadas} ocupadas</span>
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setMoverAbierto(true)}
+            className="flex shrink-0 items-center gap-2 rounded-lg border border-line px-3 py-2 text-sm font-semibold text-ink transition hover:bg-surface-2 active:scale-[0.98] sm:px-4"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4 shrink-0"
+            >
+              <path d="M4 8h13l-3-3M20 16H7l3 3" />
+            </svg>
+            <span className="hidden sm:inline">Mover productos</span>
+            <span className="sm:hidden">Mover</span>
+          </button>
         </div>
 
         <div className="mt-6">
@@ -102,6 +133,15 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      {moverAbierto && (
+        <MoverProductosModal
+          mesas={mesas}
+          secciones={secciones}
+          onCerrar={() => setMoverAbierto(false)}
+          onMovido={handleProductosMovidos}
+        />
+      )}
     </div>
   )
 }

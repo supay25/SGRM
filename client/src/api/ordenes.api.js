@@ -15,5 +15,15 @@ export const reiniciarOrdenRequest = async (mesaId) => {
   return response.data;
 };
 
+export const moverProductosRequest = async ({ mesaOrigenId, mesaDestinoId, itemsOrigen, itemsDestino }) => {
+  const response = await axiosClient.post('/ordenes/mover', {
+    mesaOrigenId,
+    mesaDestinoId,
+    itemsOrigen,
+    itemsDestino,
+  });
+  return response.data;
+};
+
 
 

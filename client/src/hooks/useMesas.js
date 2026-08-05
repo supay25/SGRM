@@ -88,5 +88,5 @@ useEffect(() => {
     }
   }, [cargar])
 
-  return { secciones, mesas, cargando, agregarMesa, actualizarMesa, eliminarMesa }
+  return { secciones, mesas, cargando, recargar: cargar, agregarMesa, actualizarMesa, eliminarMesa }
 }

@@ -1,4 +1,4 @@
-import { obtenerOrdenActivaDeMesa, agregarProductoAOrden, eliminarProductoOrden, vaciarOrden, ingresarOrden} from '../services/orden.service.js';
+import { obtenerOrdenActivaDeMesa, agregarProductoAOrden,moverEntreMesas, eliminarProductoOrden, vaciarOrden, ingresarOrden} from '../services/orden.service.js';
 
 export const verOrden = async (req, res) => {
   try {
@@ -56,6 +56,24 @@ export const ingresar = async (req, res) => {
     const { items } = req.body; // [{ productoId, cantidad }, ...]
     const orden = await ingresarOrden(restaurantId, Number(mesaId), items);
     res.status(200).json(orden);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
+export const mover = async (req, res) => {
+  try {
+    const restaurantId = req.usuario.id;
+    const { mesaOrigenId, mesaDestinoId, itemsOrigen, itemsDestino } = req.body;
+    const resultado = await moverEntreMesas(
+      restaurantId,
+      Number(mesaOrigenId),
+      Number(mesaDestinoId),
+      itemsOrigen,
+      itemsDestino
+    );
+    res.status(200).json(resultado);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

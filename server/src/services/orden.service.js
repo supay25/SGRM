@@ -243,3 +243,96 @@ export const ingresarOrden = async (restaurantId, mesaId, itemsNuevos) => {
   // 5. Devolver la orden final actualizada
   return obtenerOrdenActivaDeMesa(restaurantId, mesaId);
 };
+
+
+
+
+
+export const moverEntreMesas = async (restaurantId, mesaOrigenId, mesaDestinoId, itemsOrigen, itemsDestino) => {
+  // itemsOrigen / itemsDestino = [{ productoId, cantidad }, ...] = el estado FINAL de cada mesa
+
+  if (mesaOrigenId === mesaDestinoId) {
+    throw new Error('La mesa origen y destino no pueden ser la misma');
+  }
+
+  // Validar que ambas mesas existan y sean del restaurante
+  const [mesaOrigen, mesaDestino] = await Promise.all([
+    prisma.mesa.findFirst({ where: { id: mesaOrigenId, restaurantId } }),
+    prisma.mesa.findFirst({ where: { id: mesaDestinoId, restaurantId } }),
+  ]);
+  if (!mesaOrigen) throw new Error('Mesa origen no encontrada');
+  if (!mesaDestino) throw new Error('Mesa destino no encontrada');
+
+  // Validar todos los productos de ambas listas
+  const todosLosItems = [...itemsOrigen, ...itemsDestino];
+  const idsProductos = [...new Set(todosLosItems.map((i) => i.productoId))];
+  const productos = await prisma.producto.findMany({
+    where: { id: { in: idsProductos }, restaurantId },
+  });
+  const mapaProductos = new Map(productos.map((p) => [p.id, p]));
+  if (productos.length !== idsProductos.length) {
+    throw new Error('Uno o más productos no existen o no pertenecen a este restaurante');
+  }
+
+  // Función auxiliar: consolidar por productoId (por si un producto aparece repetido)
+  const consolidar = (items) => {
+    const mapa = new Map();
+    for (const item of items) {
+      if (item.cantidad <= 0) continue;
+      mapa.set(item.productoId, (mapa.get(item.productoId) ?? 0) + item.cantidad);
+    }
+    return Array.from(mapa.entries()).map(([productoId, cantidad]) => ({ productoId, cantidad }));
+  };
+
+  const finalOrigen = consolidar(itemsOrigen);
+  const finalDestino = consolidar(itemsDestino);
+
+  // Función auxiliar: reemplazar la orden de una mesa con una lista de items (SIN registrar anulados)
+  const reemplazarOrden = async (tx, mesaId, itemsFinales) => {
+    const ordenExistente = await tx.orden.findFirst({ where: { mesaId, restaurantId } });
+
+    if (itemsFinales.length === 0) {
+      // La mesa queda vacía → borrar la orden si existía (libera la mesa)
+      if (ordenExistente) {
+        await tx.orden.delete({ where: { id: ordenExistente.id } });
+      }
+      return;
+    }
+
+    if (ordenExistente) {
+      // Vaciar los items viejos (SIN registrar anulados) y poner los nuevos
+      await tx.ordenItem.deleteMany({ where: { ordenId: ordenExistente.id } });
+      await tx.ordenItem.createMany({
+        data: itemsFinales.map((item) => ({
+          ordenId: ordenExistente.id,
+          productoId: item.productoId,
+          cantidad: item.cantidad,
+          precioUnitario: mapaProductos.get(item.productoId).precio,
+        })),
+      });
+    } else {
+      // No había orden → crearla
+      await tx.orden.create({
+        data: {
+          mesaId,
+          restaurantId,
+          items: {
+            create: itemsFinales.map((item) => ({
+              productoId: item.productoId,
+              cantidad: item.cantidad,
+              precioUnitario: mapaProductos.get(item.productoId).precio,
+            })),
+          },
+        },
+      });
+    }
+  };
+
+  // Todo atómico: ambas mesas se actualizan, o ninguna
+  await prisma.$transaction(async (tx) => {
+    await reemplazarOrden(tx, mesaOrigenId, finalOrigen);
+    await reemplazarOrden(tx, mesaDestinoId, finalDestino);
+  });
+
+  return { mensaje: 'Productos movidos correctamente' };
+};
