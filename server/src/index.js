@@ -14,6 +14,7 @@ import ownerRoutes from './routes/owner.routes/owner.routes.js'
 import reportesRoutes from './routes/reportes.routes.js';
 import restauranteRoutes from './routes/restaurante.routes.js';
 import clienteRoutes from './routes/cliente.routes.js';
+import adminRoutes from './routes/admin/admin.routes.js';
 
 // Configurar variables de entorno
 dotenv.config();
@@ -39,6 +40,7 @@ app.use('/api/owner', ownerRoutes);
 app.use('/api/reportes', reportesRoutes);
 app.use('/api/restaurante', restauranteRoutes);
 app.use('/api/clientes', clienteRoutes);
+app.use('/api/admin', adminRoutes);
 // Ruta de prueba
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'El servidor está vivo y respondiendo' });

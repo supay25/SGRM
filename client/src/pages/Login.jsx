@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { loginRequest } from '../api/auth.api' 
 import { useNavigate } from 'react-router-dom'
+import { rutaInicial } from '../utils/rutas'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -19,15 +20,24 @@ export default function Login() {
       localStorage.setItem('accountType', data.accountType);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      if (data.accountType === 'RESTAURANT') {
-        navigate('/home');
-      } else {
-        navigate('/owner'); // Owner/SuperAdmin
-      }
+      // SUPER_ADMIN → /admin, OWNER → /owner, RESTAURANT → /home
+      navigate(rutaInicial(data.accountType, data.user?.role));
 
     } catch (err) {
-      setError(err.response?.data?.error || 'Error al iniciar sesión');
+      // El backend responde con { error: "Credenciales invalidas" | "Esta cuenta se encuentra deshabilitada" }
+      setError(err.response?.data?.error || 'No se pudo iniciar sesión. Intentá de nuevo.');
     }
+  }
+
+  // Al volver a escribir limpiamos el error para que no quede el mensaje viejo
+  function handleCambiarEmail(valor) {
+    setEmail(valor)
+    setError('')
+  }
+
+  function handleCambiarPassword(valor) {
+    setPassword(valor)
+    setError('')
   }
 
   return (
@@ -69,7 +79,7 @@ export default function Login() {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleCambiarEmail(e.target.value)}
                   placeholder="usuario@restaurante.com"
                   required
                   autoComplete="email"
@@ -101,7 +111,7 @@ export default function Login() {
                   id="password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handleCambiarPassword(e.target.value)}
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
@@ -126,6 +136,22 @@ export default function Login() {
                 ¿Olvidaste tu contraseña?
               </a>
             </div>
+
+            {/* Alerta de error del backend */}
+            {error && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="
+                  flex items-start gap-2.5
+                  rounded-lg border border-danger/40 bg-danger/10
+                  px-4 py-3
+                "
+              >
+                <span aria-hidden="true" className="text-danger text-sm leading-5">⚠️</span>
+                <p className="text-sm font-medium leading-5 text-danger">{error}</p>
+              </div>
+            )}
 
             {/* Botón submit */}
             <button

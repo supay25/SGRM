@@ -11,6 +11,9 @@ import OwnerDashboard from './pages/OwnerDashboard'
 import OwnerRestaurante from './pages/OwnerRestaurante'
 import OwnerComparativa from './pages/OwnerComparativa'
 import OwnerConfiguracion from './pages/OwnerConfiguracion'
+import AdminInicio from './pages/AdminInicio'
+import AdminAgregar from './pages/AdminAgregar'
+import AdminConfiguracion from './pages/AdminConfiguracion'
 
 function App() {
   return (
@@ -65,6 +68,22 @@ function App() {
       <Route path="/owner/configuracion" element={
         <RutaProtegida>
           <OwnerConfiguracion />
+        </RutaProtegida>
+      } />
+
+      <Route path="/admin" element={
+        <RutaProtegida rolRequerido="SUPER_ADMIN">
+          <AdminInicio />
+        </RutaProtegida>
+      } />
+      <Route path="/admin/agregar" element={
+        <RutaProtegida rolRequerido="SUPER_ADMIN">
+          <AdminAgregar />
+        </RutaProtegida>
+      } />
+      <Route path="/admin/configuracion" element={
+        <RutaProtegida rolRequerido="SUPER_ADMIN">
+          <AdminConfiguracion />
         </RutaProtegida>
       } />
 
