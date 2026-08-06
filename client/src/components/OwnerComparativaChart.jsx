@@ -7,11 +7,20 @@ const COLOR_TOP = '#d97706'
 
 export default function OwnerComparativaChart({ data }) {
   const restaurantes = data
-    .map((item) => ({ name: item.name, ingresoReal: Number(item.ingresoReal) }))
+    .map((item) => ({
+      restauranteId: item.restauranteId,
+      nombre: item.nombre,
+      ingresoReal: Number(item.ingresoReal),
+    }))
     .sort((a, b) => b.ingresoReal - a.ingresoReal)
 
   if (restaurantes.length === 0) {
     return <p className="py-10 text-center text-sm text-muted">Todavía no hay restaurantes para comparar.</p>
+  }
+
+  // Sin ingresos en el rango todas las barras quedan en cero: no hay nada que graficar.
+  if (restaurantes.every((restaurante) => restaurante.ingresoReal === 0)) {
+    return <p className="py-10 text-center text-sm text-muted">No hubo ingresos en el período seleccionado.</p>
   }
 
   return (
@@ -20,7 +29,7 @@ export default function OwnerComparativaChart({ data }) {
         <XAxis type="number" hide />
         <YAxis
           type="category"
-          dataKey="name"
+          dataKey="nombre"
           width={110}
           tickLine={false}
           axisLine={false}
@@ -38,7 +47,7 @@ export default function OwnerComparativaChart({ data }) {
         />
         <Bar dataKey="ingresoReal" radius={[0, 4, 4, 0]} maxBarSize={24}>
           {restaurantes.map((entry, index) => (
-            <Cell key={entry.name} fill={index === 0 ? COLOR_TOP : COLOR_BASE} />
+            <Cell key={entry.restauranteId} fill={index === 0 ? COLOR_TOP : COLOR_BASE} />
           ))}
         </Bar>
       </BarChart>

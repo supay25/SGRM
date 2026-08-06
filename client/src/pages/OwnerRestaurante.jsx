@@ -10,7 +10,9 @@ import HistorialCierreCard from '../components/HistorialCierreCard'
 import CierreBusquedaModal from '../components/CierreBusquedaModal'
 import FacturaBusquedaModal from '../components/FacturaBusquedaModal'
 import ConsultaRangoCard from '../components/ConsultaRangoCard'
+import SelectorRango from '../components/SelectorRango'
 import EstadisticaInline from '../components/EstadisticaInline'
+import OwnerConfiguracionRestauranteTab from '../components/OwnerConfiguracionRestauranteTab'
 import useOwnerRestaurantes from '../hooks/useOwnerRestaurantes'
 import useOwnerRestauranteDetalle from '../hooks/useOwnerRestauranteDetalle'
 import {
@@ -38,8 +40,18 @@ export default function OwnerRestaurante() {
   const [tabActivo, setTabActivo] = useState('resumen')
 
   const { restaurantes } = useOwnerRestaurantes()
-  const { cargando, resumen, metricas, cierres, buscarCierrePorFecha, buscarFacturaPorNumero } =
-    useOwnerRestauranteDetalle(restauranteId)
+  const {
+    cargando,
+    restaurante: detalle,
+    resumen,
+    metricas,
+    cierres,
+    rangoMetricas,
+    cargandoMetricas,
+    cambiarRangoMetricas,
+    buscarCierrePorFecha,
+    buscarFacturaPorNumero,
+  } = useOwnerRestauranteDetalle(restauranteId)
 
   const restaurante = restaurantes.find((r) => r.id === restauranteId)
 
@@ -68,7 +80,7 @@ export default function OwnerRestaurante() {
     setBuscandoCierre(true)
     try {
       const resultado = await buscarCierrePorFecha(fechaBusqueda)
-      setCierreEncontrado(resultado)
+      setCierreEncontrado(resultado.cierre)
       setFechaModal(fechaBusqueda)
       setModalCierreAbierto(true)
     } finally {
@@ -143,19 +155,34 @@ export default function OwnerRestaurante() {
             {tabActivo === 'reportes' && (
               <div className="mt-6">
                 <h1 className="text-xl font-bold text-ink tracking-tight">Estadisticas</h1>
-                <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-                  <TarjetaGrafico titulo="Top 5 productos más vendidos">
-                    <OwnerTopProductosChart data={metricas.masVendidos} />
-                  </TarjetaGrafico>
-                  <TarjetaGrafico titulo="Ventas por sección">
-                    <OwnerVentasPorSeccionChart data={metricas.porSeccion} />
-                  </TarjetaGrafico>
-                  <div className="lg:col-span-2">
-                    <TarjetaGrafico titulo="Tendencia de ingreso real (últimos cierres)">
-                      <OwnerTendenciaChart data={metricas.tendencia} />
-                    </TarjetaGrafico>
-                  </div>
+
+                <div className="mt-4">
+                  <SelectorRango
+                    titulo="Período de las estadísticas"
+                    desde={rangoMetricas.desde}
+                    hasta={rangoMetricas.hasta}
+                    cargando={cargandoMetricas}
+                    onAplicar={cambiarRangoMetricas}
+                  />
                 </div>
+
+                {!metricas ? (
+                  <div className="mt-10 text-center text-muted">Cargando estadísticas...</div>
+                ) : (
+                  <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    <TarjetaGrafico titulo="Top 5 productos más vendidos">
+                      <OwnerTopProductosChart data={metricas.masVendidos} />
+                    </TarjetaGrafico>
+                    <TarjetaGrafico titulo="Ventas por sección">
+                      <OwnerVentasPorSeccionChart data={metricas.porSeccion} />
+                    </TarjetaGrafico>
+                    <div className="lg:col-span-2">
+                      <TarjetaGrafico titulo="Tendencia de ingreso real (cierres del período)">
+                        <OwnerTendenciaChart data={metricas.tendencia} />
+                      </TarjetaGrafico>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -305,6 +332,13 @@ export default function OwnerRestaurante() {
                     }
                   </ConsultaRangoCard>
                 </div>
+              </div>
+            )}
+
+            {tabActivo === 'configuracion' && (
+              <div className="mt-6">
+                <h1 className="text-xl font-bold text-ink tracking-tight">Configuración</h1>
+                <OwnerConfiguracionRestauranteTab restauranteId={restauranteId} restaurante={detalle} />
               </div>
             )}
           </>

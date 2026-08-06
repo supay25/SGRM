@@ -32,10 +32,23 @@ export const resumenDia = async (restaurantId) => {
 };
 
 // ── Métricas (top productos, por sección, tendencia) ──
-export const metricas = async (restaurantId) => {
+export const metricas = async (restaurantId, desde = null, hasta = null) => {
+  // Rango: si no viene, últimos 30 días
+  let inicio, fin;
+  if (desde && hasta) {
+    inicio = new Date(`${desde}T00:00:00.000Z`);
+    fin = new Date(`${hasta}T23:59:59.999Z`);
+  } else {
+    fin = new Date();
+    inicio = new Date();
+    inicio.setDate(inicio.getDate() - 30);
+  }
+
+  const filtroFecha = { fecha: { gte: inicio, lte: fin } };
+
   const masVendidos = await prisma.facturaItem.groupBy({
     by: ['nombreProducto'],
-    where: { factura: { restaurantId, anulada: false } },
+    where: { factura: { restaurantId, anulada: false, ...filtroFecha } },
     _sum: { cantidad: true },
     orderBy: { _sum: { cantidad: 'desc' } },
     take: 5,
@@ -43,7 +56,7 @@ export const metricas = async (restaurantId) => {
 
   const porSeccion = await prisma.factura.groupBy({
     by: ['seccionId'],
-    where: { restaurantId, anulada: false },
+    where: { restaurantId, anulada: false, ...filtroFecha },
     _sum: { montoNeto: true },
     _count: true,
   });
@@ -54,10 +67,10 @@ export const metricas = async (restaurantId) => {
   });
   const nombreSeccion = new Map(secciones.map((s) => [s.id, s.nombre]));
 
-  const ultimosCierres = await prisma.cierre.findMany({
-    where: { restaurantId },
-    orderBy: { fecha: 'desc' },
-    take: 7,
+  // Tendencia: cierres del rango, ordenados ascendente
+  const cierresRango = await prisma.cierre.findMany({
+    where: { restaurantId, fecha: { gte: inicio, lte: fin } },
+    orderBy: { fecha: 'asc' },
   });
 
   return {
@@ -67,7 +80,7 @@ export const metricas = async (restaurantId) => {
       total: s._sum.montoNeto,
       facturas: s._count,
     })),
-    tendencia: ultimosCierres.map((c) => ({ fecha: c.fecha, ingresoReal: c.ingresoReal })).reverse(),
+    tendencia: cierresRango.map((c) => ({ fecha: c.fecha, ingresoReal: c.ingresoReal })),
   };
 };
 
@@ -90,10 +103,21 @@ export const facturas = async (restaurantId) => {
 
 // ── Buscar cierre por fecha ──
 export const buscarCierrePorFecha = async (restaurantId, fecha) => {
+  const inicio = new Date(`${fecha}T00:00:00.000Z`);
+  const fin = new Date(`${fecha}T23:59:59.999Z`);
   const dia = new Date(`${fecha}T00:00:00.000Z`);
-  return await prisma.cierre.findFirst({
-    where: { restaurantId, fecha: dia },
-  });
+
+  const [cierre, cantidadFacturas] = await Promise.all([
+    prisma.cierre.findFirst({ where: { restaurantId, fecha: dia } }),
+    prisma.factura.count({
+      where: { restaurantId, anulada: false, fecha: { gte: inicio, lte: fin } },
+    }),
+  ]);
+
+  return {
+    cierre,
+    hayFacturas: cantidadFacturas > 0,
+  };
 };
 
 // ── Buscar factura por número ──

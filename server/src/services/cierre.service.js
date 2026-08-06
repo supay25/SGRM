@@ -1,20 +1,47 @@
 import prisma from '../config/db.js';
 import { Prisma } from '@prisma/client';
 
-export const crearCierre = async (restaurantId) => {
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
+export const crearCierre = async (restaurantId, fechaStr = null) => {
+  const esHoy = !fechaStr;
 
-  // 1. ¿Ya se cerró hoy?
+  // Día a cerrar: hoy si no viene fecha, o la fecha dada
+  let dia;
+  if (esHoy) {
+    dia = new Date();
+    dia.setHours(0, 0, 0, 0);
+  } else {
+    dia = new Date(`${fechaStr}T00:00:00.000Z`);
+  }
+
+
+  const hoyInicio = new Date();
+  hoyInicio.setUTCHours(0, 0, 0, 0);
+  if (dia > hoyInicio) {
+    throw new Error('No se puede cerrar un día que aún no ha llegado');
+  }
+
+  // 1. ¿Ya se cerró ese día?
   const cierreExistente = await prisma.cierre.findFirst({
-    where: { restaurantId, fecha: hoy },
+    where: { restaurantId, fecha: dia },
   });
   if (cierreExistente) throw new Error('El día ya fue cerrado');
 
-  // 2. Traer las facturas de hoy
-  const inicioDia = new Date(hoy);
-  const finDia = new Date(hoy);
-  finDia.setHours(23, 59, 59, 999);
+  // 2. Validar mesas ocupadas — SOLO para el cierre de hoy
+  if (esHoy) {
+    const ordenesActivas = await prisma.orden.count({ where: { restaurantId } });
+    if (ordenesActivas > 0) {
+      throw new Error('Hay mesas con productos sin facturar. Factura o vacía todas las mesas antes de cerrar.');
+    }
+  }
+
+  // 3. Traer las facturas de ese día
+  const inicioDia = new Date(dia);
+  const finDia = new Date(dia);
+  if (esHoy) {
+    finDia.setHours(23, 59, 59, 999);
+  } else {
+    finDia.setUTCHours(23, 59, 59, 999);
+  }
 
   const facturas = await prisma.factura.findMany({
     where: {
@@ -25,28 +52,22 @@ export const crearCierre = async (restaurantId) => {
     orderBy: { numeroFactura: 'asc' },
   });
 
-  if (facturas.length === 0) throw new Error('No hay facturas para cerrar hoy');
+  if (facturas.length === 0) throw new Error('No hay facturas para cerrar ese día');
 
-  // 3. Sumar los montos con Decimal
-  const totalNeto = facturas.reduce(
-    (acc, f) => acc.plus(f.montoNeto),
-    new Prisma.Decimal(0)
-  );
-  const totalServicio = facturas.reduce(
-    (acc, f) => acc.plus(f.montoServicio),
-    new Prisma.Decimal(0)
-  );
+  // 4. Sumar montos con Decimal
+  const totalNeto = facturas.reduce((acc, f) => acc.plus(f.montoNeto), new Prisma.Decimal(0));
+  const totalServicio = facturas.reduce((acc, f) => acc.plus(f.montoServicio), new Prisma.Decimal(0));
   const ingresoReal = totalNeto.minus(totalServicio);
 
-  // 4. Rango de consecutivos (ya vienen ordenadas asc)
+  // 5. Rango de consecutivos
   const primeraFactura = facturas[0].numeroFactura;
   const ultimaFactura = facturas[facturas.length - 1].numeroFactura;
 
-  // 5. Crear el cierre
+  // 6. Crear el cierre
   const cierre = await prisma.cierre.create({
     data: {
       restaurantId,
-      fecha: hoy,
+      fecha: dia,
       primeraFactura,
       ultimaFactura,
       totalNeto,
@@ -57,8 +78,6 @@ export const crearCierre = async (restaurantId) => {
 
   return cierre;
 };
-
-
 
 
 // Trae los datos completos de un cierre para el reporte: el cierre + los anulados de ese día
@@ -90,6 +109,7 @@ export const listarCierres = async (restaurantId) => {
   return await prisma.cierre.findMany({
     where: { restaurantId },
     orderBy: { fecha: 'desc' },
+    take: 5,
   });
 };
 
@@ -125,8 +145,8 @@ export const resumenDelDia = async (restaurantId) => {
   });
 
   return {
-    cantidad: facturas.length,                            
-    primeraFactura: facturas[0]?.numeroFactura ?? null,   
+    cantidad: facturas.length,
+    primeraFactura: facturas[0]?.numeroFactura ?? null,
     ultimaFactura: facturas[facturas.length - 1]?.numeroFactura ?? null,
     totalNeto,
     totalServicio,

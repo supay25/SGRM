@@ -29,6 +29,12 @@ export const getConsecutivoFacturasRequest = async (restaurantId, desde, hasta) 
 }
 
 
+export const crearCierreFechaRequest = async (fecha) => {
+  const response = await axiosClient.post('/cierres', { fecha })
+  return response.data
+}
+
+
 
 export const getMisVentasRequest = async (desde, hasta) => {
   const response = await axiosClient.get('/reportes/ventas', { params: { desde, hasta } })

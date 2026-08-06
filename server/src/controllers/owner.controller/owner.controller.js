@@ -52,7 +52,8 @@ export const metricasRestaurante = async (req, res) => {
     const ownerId = req.usuario.id;
     const restaurantId = Number(req.params.id);
     await validarRestauranteDelOwner(ownerId, restaurantId);
-    const data = await metricas(restaurantId);
+    const { desde, hasta } = req.query;
+    const data = await metricas(restaurantId, desde, hasta);
     res.status(200).json(data);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -153,6 +154,65 @@ export const reporteConsecutivo = async (req, res) => {
     const { desde, hasta } = req.query;
     await validarRestauranteDelOwner(ownerId, restaurantId);
     const data = await consecutivoRango(restaurantId, desde, hasta);
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
+
+
+// En owner.controller.js
+import {
+  actualizarPerfilOwner, cambiarPasswordOwner,
+  actualizarRestauranteDelOwner, resetearPasswordRestaurante,
+} from '../../services/owner/owner.service.js';
+
+export const editarPerfil = async (req, res) => {
+  try {
+    const data = await actualizarPerfilOwner(req.usuario.id, req.body.nombre);
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const cambiarPassword = async (req, res) => {
+  try {
+    const { passwordActual, passwordNueva } = req.body;
+    const data = await cambiarPasswordOwner(req.usuario.id, passwordActual, passwordNueva);
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const editarRestaurante = async (req, res) => {
+  try {
+    const data = await actualizarRestauranteDelOwner(req.usuario.id, Number(req.params.id), req.body);
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const resetearPasswordRest = async (req, res) => {
+  try {
+    const data = await resetearPasswordRestaurante(req.usuario.id, Number(req.params.id), req.body.passwordNueva);
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+import { comparativaRestaurantes } from '../../services/owner/owner.service.js';
+
+export const comparativa = async (req, res) => {
+  try {
+    const ownerId = req.usuario.id;
+    const { desde, hasta } = req.query;
+    const data = await comparativaRestaurantes(ownerId, desde, hasta);
     res.status(200).json(data);
   } catch (error) {
     res.status(400).json({ error: error.message });

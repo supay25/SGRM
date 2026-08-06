@@ -6,7 +6,7 @@ import CierreBusquedaModal from '../components/CierreBusquedaModal'
 import FacturaBusquedaModal from '../components/FacturaBusquedaModal'
 import { editarClienteFacturaRequest } from '../api/cliente.api'
 import { formatearColones } from '../utils/formato'
-import Navbar from '../components/navbar'   
+import Navbar from '../components/navbar'
 
 import {
   getMisVentasRequest,
@@ -14,7 +14,8 @@ import {
   getMisProductosRequest,
   getMisConsecutivoRequest,
   getMisCierrePorFechaRequest,
-  getMisFacturaPorNumeroRequest
+  getMisFacturaPorNumeroRequest,
+  crearCierreFechaRequest
 } from '../api/reportes.api'
 
 export default function Reportes() {
@@ -25,6 +26,8 @@ export default function Reportes() {
   const [fechaCierreBuscada, setFechaCierreBuscada] = useState('')
   const [modalCierreAbierto, setModalCierreAbierto] = useState(false)
   const [buscandoCierre, setBuscandoCierre] = useState(false)
+  const [hayFacturas, setHayFacturas] = useState(false)
+
 
   // Buscar factura por número (TODO: backend del restaurante)
   const [numeroFactura, setNumeroFactura] = useState('')
@@ -35,45 +38,53 @@ export default function Reportes() {
 
 
 
-async function handleBuscarCierre() {
-  if (!fechaCierre) return
-  setBuscandoCierre(true)
-  try {
-    const resultado = await getMisCierrePorFechaRequest(fechaCierre)
-    setCierreEncontrado(resultado)
-    setFechaCierreBuscada(fechaCierre)
-    setModalCierreAbierto(true)
-  } finally {
-    setBuscandoCierre(false)
+  async function handleBuscarCierre() {
+    if (!fechaCierre) return
+    setBuscandoCierre(true)
+    try {
+      const resultado = await getMisCierrePorFechaRequest(fechaCierre)
+      setCierreEncontrado(resultado.cierre)        // el cierre pelado (o null)
+      setHayFacturas(resultado.hayFacturas)         // el flag aparte
+      setFechaCierreBuscada(fechaCierre)
+      setModalCierreAbierto(true)
+    } finally {
+      setBuscandoCierre(false)
+    }
   }
-}
 
-async function handleBuscarFactura() {
-  if (!numeroFactura.trim()) return
-  setBuscandoFactura(true)
-  try {
-    const resultado = await getMisFacturaPorNumeroRequest(numeroFactura.trim())
-    setFacturaEncontrada(resultado)
-    setNumeroFacturaBuscado(numeroFactura.trim())
-    setModalFacturaAbierto(true)
-  } finally {
-    setBuscandoFactura(false)
+  async function handleBuscarFactura() {
+    if (!numeroFactura.trim()) return
+    setBuscandoFactura(true)
+    try {
+      const resultado = await getMisFacturaPorNumeroRequest(numeroFactura.trim())
+      setFacturaEncontrada(resultado)
+      setNumeroFacturaBuscado(numeroFactura.trim())
+      setModalFacturaAbierto(true)
+    } finally {
+      setBuscandoFactura(false)
+    }
   }
-}
 
 
-async function handleEditarClienteFactura(nombreCliente) {
-  try {
-    await editarClienteFacturaRequest(facturaEncontrada.id, nombreCliente)
-    setFacturaEncontrada((prev) => ({ ...prev, nombreCliente }))
-  } catch (error) {
-    alert(error.response?.data?.error || 'Error al editar el cliente')
+  async function handleCerrarDia(fecha) {
+    const cierre = await crearCierreFechaRequest(fecha)   // crea el cierre de ese día
+    setCierreEncontrado(cierre)                           // ahora el modal pasa al caso 1
+    setHayFacturas(false)
   }
-}
+
+
+  async function handleEditarClienteFactura(nombreCliente) {
+    try {
+      await editarClienteFacturaRequest(facturaEncontrada.id, nombreCliente)
+      setFacturaEncontrada((prev) => ({ ...prev, nombreCliente }))
+    } catch (error) {
+      alert(error.response?.data?.error || 'Error al editar el cliente')
+    }
+  }
 
 
   function handleLogout() {
-  
+
     localStorage.removeItem('token')
     localStorage.removeItem('accountType')
     localStorage.removeItem('user')
@@ -100,6 +111,7 @@ async function handleEditarClienteFactura(nombreCliente) {
                   type="date"
                   value={fechaCierre}
                   onChange={(event) => setFechaCierre(event.target.value)}
+                  max={new Date().toISOString().split('T')[0]}
                   style={{ accentColor: 'var(--color-ember)' }}
                   className="w-full rounded-lg border border-line bg-surface-2 px-3 py-2.5 text-sm text-ink scheme-dark focus:outline-none focus:ring-2 focus:ring-ember/60 focus:border-transparent transition"
                 />
@@ -226,6 +238,8 @@ async function handleEditarClienteFactura(nombreCliente) {
         <CierreBusquedaModal
           fechaBuscada={fechaCierreBuscada}
           cierre={cierreEncontrado}
+          hayFacturas={hayFacturas}
+          onCerrarDia={handleCerrarDia}
           onCerrar={() => setModalCierreAbierto(false)}
         />
       )}

@@ -15,24 +15,23 @@ export const registrarUsuario = async ({ name, email, password }) => {
     data: { name, email, password: passwordHash },
   });
 
-  // Devolvemos el usuario sin el campo password (el cliente no necesita ver el hash)
+  // Devolvemos el usuario sin el campo password
   const { password: _, ...usuarioSinPassword } = nuevoUsuario;
   return usuarioSinPassword;
 };
 
 
-
 export const loginUsuario = async (email, password) => {
-
   let cuenta = await prisma.user.findUnique({ where: { email } });
   let accountType = 'USER';
 
   if (!cuenta) {
-    cuenta = await prisma.restaurant.findUnique({ where: { email } });
+    cuenta = await prisma.restaurant.findUnique({
+      where: { email },
+      include: { user: true },   //  traemos el owner para verificar su estado
+    });
     accountType = 'RESTAURANT';
   }
-
-  console.log('¿Encontró cuenta?:', cuenta); // 👈 temporal
 
   if (!cuenta) {
     throw new Error('Credenciales invalidas');
@@ -42,16 +41,17 @@ export const loginUsuario = async (email, password) => {
     throw new Error('Esta cuenta se encuentra deshabilitada');
   }
 
+  // Cascadasi es un restaurante, su owner tambien debe estar activo
+  if (accountType === 'RESTAURANT' && cuenta.user && !cuenta.user.isActive) {
+    throw new Error('Esta cuenta se encuentra deshabilitada');
+  }
+
   const isMatch = await bcrypt.compare(password, cuenta.password);
-
-  console.log('¿Password coincide?:', isMatch); // 👈 temporal
-
   if (!isMatch) {
     throw new Error('Credenciales invalidas');
   }
 
   const payload = { id: cuenta.id, type: accountType };
-
   if (accountType === 'USER') {
     payload.role = cuenta.role;
   }
@@ -63,15 +63,9 @@ export const loginUsuario = async (email, password) => {
     name: cuenta.name,
     email: cuenta.email,
   };
-
   if (accountType === 'USER') {
     user.role = cuenta.role;
   }
 
-  return {
-    accountType,
-    user,
-    token
-  };
-
+  return { accountType, user, token };
 };

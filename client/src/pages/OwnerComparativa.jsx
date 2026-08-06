@@ -1,10 +1,13 @@
 import OwnerNavbar from '../components/OwnerNavbar'
 import OwnerComparativaChart from '../components/OwnerComparativaChart'
 import OwnerComparativaItem from '../components/OwnerComparativaItem'
+import SelectorRango from '../components/SelectorRango'
 import useOwnerComparativa from '../hooks/useOwnerComparativa'
 
 export default function OwnerComparativa() {
-  const { cargando, restaurantes } = useOwnerComparativa()
+  const { rango, cargando, error, restaurantes, aplicarRango } = useOwnerComparativa()
+
+  const sinIngresos = restaurantes.every((restaurante) => restaurante.ingresoReal === 0)
 
   return (
     <div className="min-h-screen bg-page">
@@ -12,7 +15,21 @@ export default function OwnerComparativa() {
 
       <main className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
         <h1 className="text-2xl font-bold text-ink tracking-tight">Comparativa</h1>
-        <p className="mt-1 text-sm text-muted">Ingreso real de hoy entre todos tus restaurantes.</p>
+        <p className="mt-1 text-sm text-muted">Ingreso real por período entre todos tus restaurantes.</p>
+
+        <div className="mt-6">
+          <SelectorRango
+            titulo="Período a comparar"
+            desde={rango.desde}
+            hasta={rango.hasta}
+            cargando={cargando}
+            onAplicar={aplicarRango}
+          />
+        </div>
+
+        {error && (
+          <div className="mt-4 rounded-xl border border-line bg-surface p-4 text-sm text-ember">{error}</div>
+        )}
 
         {cargando ? (
           <div className="mt-10 text-center text-muted">Cargando comparativa...</div>
@@ -24,16 +41,19 @@ export default function OwnerComparativa() {
         ) : (
           <>
             <div className="mt-6 rounded-xl border border-line bg-surface p-5">
-              <h2 className="text-sm font-semibold text-ink tracking-tight">Ingreso real de hoy por restaurante</h2>
+              <h2 className="text-sm font-semibold text-ink tracking-tight">Ingreso real por restaurante</h2>
               <div className="mt-3">
                 <OwnerComparativaChart data={restaurantes} />
               </div>
             </div>
 
-            <h2 className="mt-8 text-lg font-semibold text-ink tracking-tight">Cifras del día</h2>
+            <h2 className="mt-8 text-lg font-semibold text-ink tracking-tight">Cifras del período</h2>
+            {sinIngresos && (
+              <p className="mt-1 text-sm text-muted">Ningún restaurante registró ingresos en este período.</p>
+            )}
             <div className="mt-4 space-y-3">
               {restaurantes.map((restaurante) => (
-                <OwnerComparativaItem key={restaurante.id} restaurante={restaurante} />
+                <OwnerComparativaItem key={restaurante.restauranteId} restaurante={restaurante} />
               ))}
             </div>
           </>

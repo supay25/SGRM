@@ -19,10 +19,6 @@ const resumir = (items) =>
     { unidades: 0, monto: 0 }
   )
 
-/**
- * Estado del intercambio de productos entre dos mesas.
- * Todo lo que se mueve es LOCAL: nada toca el backend hasta confirmar().
- */
 export default function useMoverProductos() {
   const [mesaOrigenId, setMesaOrigenId] = useState('')
   const [mesaDestinoId, setMesaDestinoId] = useState('')
@@ -33,8 +29,7 @@ export default function useMoverProductos() {
 
   const ambasElegidas = Boolean(mesaOrigenId && mesaDestinoId && mesaOrigenId !== mesaDestinoId)
 
-  // Cada vez que cambia alguna de las dos mesas se recargan ambos paneles
-  // desde el backend, descartando lo que se hubiera movido antes.
+
   useEffect(() => {
     if (!ambasElegidas) {
       setPaneles({ origen: [], destino: [] })

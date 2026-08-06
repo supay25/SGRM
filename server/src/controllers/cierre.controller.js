@@ -4,13 +4,13 @@ import { crearCierre, obtenerReporteCierre, listarCierres, resumenDelDia } from 
 export const crear = async (req, res) => {
   try {
     const restaurantId = req.usuario.id;
-    const cierre = await crearCierre(restaurantId);
+    const { fecha } = req.body;
+    const cierre = await crearCierre(restaurantId, fecha || null);
     res.status(201).json(cierre);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
-
 export const listar = async (req, res) => {
   try {
     const restaurantId = req.usuario.id;

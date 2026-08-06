@@ -12,6 +12,13 @@ import {
   reporteServicio,
   reporteProductos,
   reporteConsecutivo,
+  editarPerfil,
+  cambiarPassword,
+  editarRestaurante,
+  resetearPasswordRest,
+  comparativa,
+
+
 } from '../../controllers/owner.controller/owner.controller.js';
 import { verificarToken, soloOwner } from '../../middleware/auth.middleware.js';
 
@@ -19,6 +26,7 @@ const router = Router();
 
 // Lista y detalle
 router.get('/restaurantes', verificarToken, soloOwner, misRestaurantes);
+router.get('/comparativa', verificarToken, soloOwner, comparativa);
 router.get('/restaurantes/:id', verificarToken, soloOwner, misdetallesRestaurante);
 
 // Resumen y métricas
@@ -36,6 +44,13 @@ router.get('/restaurantes/:id/reportes/ventas', verificarToken, soloOwner, repor
 router.get('/restaurantes/:id/reportes/servicio', verificarToken, soloOwner, reporteServicio);
 router.get('/restaurantes/:id/reportes/productos', verificarToken, soloOwner, reporteProductos);
 router.get('/restaurantes/:id/reportes/consecutivo', verificarToken, soloOwner, reporteConsecutivo);
+
+
+router.patch('/perfil', verificarToken, soloOwner, editarPerfil);
+router.patch('/password', verificarToken, soloOwner, cambiarPassword);
+router.patch('/restaurantes/:id/datos', verificarToken, soloOwner, editarRestaurante);
+router.patch('/restaurantes/:id/password', verificarToken, soloOwner, resetearPasswordRest);
+
 
 export default router;
 

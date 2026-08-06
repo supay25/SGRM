@@ -2,6 +2,7 @@ const TABS = [
   { id: 'resumen', etiqueta: 'Resumen' },
   { id: 'reportes', etiqueta: 'Estadísticas' },
   { id: 'facturacion', etiqueta: 'Reportes' },
+  { id: 'configuracion', etiqueta: 'Configuración' },
 ]
 
 export default function OwnerRestauranteTabs({ tabActivo, onCambiarTab }) {

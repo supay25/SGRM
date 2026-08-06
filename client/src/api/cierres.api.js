@@ -19,3 +19,4 @@ export const getResumenHoyRequest = async () => {
   const response = await axiosClient.get('/cierres/resumen-hoy');
   return response.data;
 };
+

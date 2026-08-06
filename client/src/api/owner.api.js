@@ -14,10 +14,6 @@ export const getResumenRestauranteRequest = async (id) => {
   const response = await axiosClient.get(`/owner/restaurantes/${id}/resumen`);
   return response.data;
 };
-export const getMetricasRestauranteRequest = async (id) => {
-  const response = await axiosClient.get(`/owner/restaurantes/${id}/metricas`);
-  return response.data;
-};
 export const getCierresRestauranteRequest = async (id) => {
   const response = await axiosClient.get(`/owner/restaurantes/${id}/cierres`);
   return response.data;
@@ -64,3 +60,40 @@ export const getReporteConsecutivoRequest = async (id, desde, hasta) => {
   });
   return response.data;
 };
+
+
+
+
+export const editarPerfilOwnerRequest = async (nombre) => {
+  const response = await axiosClient.patch('/owner/perfil', { nombre });
+  return response.data;
+};
+
+export const cambiarPasswordOwnerRequest = async (passwordActual, passwordNueva) => {
+  const response = await axiosClient.patch('/owner/password', { passwordActual, passwordNueva });
+  return response.data;
+};
+
+export const editarRestauranteRequest = async (id, datos) => {
+  const response = await axiosClient.patch(`/owner/restaurantes/${id}/datos`, datos);
+  return response.data;
+};
+
+export const resetearPasswordRestauranteRequest = async (id, passwordNueva) => {
+  const response = await axiosClient.patch(`/owner/restaurantes/${id}/password`, { passwordNueva });
+  return response.data;
+};
+
+
+export const getComparativaRequest = async (desde, hasta) => {
+  const response = await axiosClient.get('/owner/comparativa', { params: { desde, hasta } })
+  return response.data
+}
+
+
+export const getMetricasRestauranteRequest = async (id, desde, hasta) => {
+  const response = await axiosClient.get(`/owner/restaurantes/${id}/metricas`, {
+    params: { desde, hasta },
+  })
+  return response.data
+}
