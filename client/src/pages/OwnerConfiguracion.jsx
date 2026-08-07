@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import OwnerNavbar from '../components/OwnerNavbar'
+import CampoPassword from '../components/CampoPassword'
 import { editarPerfilOwnerRequest, cambiarPasswordOwnerRequest } from '../api/owner.api.js'
 
 function leerUsuario() {
@@ -11,6 +12,22 @@ function leerUsuario() {
 }
 
 function Campo({ id, etiqueta, valor, onCambiar, tipo = 'text', placeholder, deshabilitado, ayuda, ...resto }) {
+  // Las contraseñas usan el campo con ojo para mostrar/ocultar el texto
+  if (tipo === 'password') {
+    return (
+      <CampoPassword
+        id={id}
+        etiqueta={etiqueta}
+        valor={valor}
+        onCambiar={onCambiar}
+        placeholder={placeholder}
+        deshabilitado={deshabilitado}
+        ayuda={ayuda}
+        {...resto}
+      />
+    )
+  }
+
   return (
     <div className="space-y-1.5">
       <label htmlFor={id} className="block text-xs font-semibold uppercase tracking-wider text-muted">
