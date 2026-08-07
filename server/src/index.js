@@ -23,7 +23,15 @@ const app = express();
 const PORT = process.env.PORT;
 
 // Middlewares
-app.use(cors());
+const origenesPermitidos = [
+  'http://localhost:5173',
+  'https://sgrm.vercel.app',
+];
+
+app.use(cors({
+  origin: origenesPermitidos,
+  credentials: true,
+}));
 app.use(morgan('dev'));
 app.use(express.json()); // Para que el servidor entienda JSON
 

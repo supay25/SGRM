@@ -95,10 +95,9 @@ export default function OrdenMesa() {
             <span
               className={`
                 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold
-                ${
-                  totalUnidades > 0
-                    ? 'bg-ember/15 text-ember-light ring-1 ring-ember/45'
-                    : 'border border-line-strong bg-surface-2 text-subtle'
+                ${totalUnidades > 0
+                  ? 'bg-ember/15 text-ember-light ring-1 ring-ember/45'
+                  : 'border border-line-strong bg-surface-2 text-subtle'
                 }
               `}
             >
@@ -204,7 +203,7 @@ export default function OrdenMesa() {
       </aside>
       {/* COLUMNA DERECHA — el catálogo */}
       <main className="flex flex-1 flex-col md:h-full md:min-h-0">
-        <div className="shrink-0 border-b border-line-strong p-4">
+        <div className="shrink-0 border-b border-line p-4">
           <CategoriaTabs
             categorias={categorias}
             categoriaActivaId={categoriaActivaId}
@@ -235,8 +234,9 @@ export default function OrdenMesa() {
           seccion={seccion}
           onDividir={() => setVistaFactura('dividir')}
           onFacturar={async (datos) => {
-            // Si la orden queda con productos, `facturar` recarga y nos deja en la mesa.
-            await facturar({ items: itemsAFacturar, ...datos })
+            const descuento = datos?.descuento ?? 0
+            const nombreCliente = datos?.nombreCliente ?? 'Cliente al contado'
+            await facturar(itemsAFacturar, descuento, nombreCliente)
             cerrarFacturacion()
           }}
           onCerrar={cerrarFacturacion}

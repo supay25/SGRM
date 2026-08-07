@@ -4,7 +4,7 @@ import { crearCierre, obtenerReporteCierre, listarCierres, resumenDelDia } from 
 export const crear = async (req, res) => {
   try {
     const restaurantId = req.usuario.id;
-    const { fecha } = req.body;
+    const { fecha } = req.body || {};
     const cierre = await crearCierre(restaurantId, fecha || null);
     res.status(201).json(cierre);
   } catch (error) {

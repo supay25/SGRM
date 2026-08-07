@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { getMesa } from '../api/mesas.api'
 import { getProductos } from '../api/productos.api'
 import { getOrdenDeMesa, ingresarOrdenRequest, reiniciarOrdenRequest } from '../api/ordenes.api'
-import { crearFacturaRequest } from '../api/facturas.api'
+import { crearFacturaRequest, facturarDivididoRequest } from '../api/facturas.api'
 import useAvisoError from './useAvisoError'
 
 export default function useOrdenMesa(mesaId) {
@@ -166,16 +166,28 @@ export default function useOrdenMesa(mesaId) {
   // true cuando el borrador quedó vacío PERO había orden guardada → toca vaciar en backend
   const debeVaciar = lineas.length === 0 && ordenGuardadaEnBackend
 
-  const facturar = useCallback(async () => {
-    if (lineas.length === 0) return
+const facturar = useCallback(
+  async (itemsAFacturar, descuento = 0, nombreCliente = 'Cliente al contado') => {
+    
+    if (!itemsAFacturar || itemsAFacturar.length === 0) {
+      console.log('SALIO: items vacio')
+      return
+    }
     try {
-      await crearFacturaRequest(Number(mesaId))
+      const items = itemsAFacturar.map((linea) => ({
+        productoId: linea.productoId,
+        cantidad: linea.cantidad,
+      }))
+      
+      await facturarDivididoRequest(Number(mesaId), items, descuento, nombreCliente)
       navigate('/home')
     } catch (error) {
+      console.log('ERROR EN CATCH:', error)
       avisarError(error, 'Error al facturar')
     }
-  }, [lineas, mesaId, navigate, avisarError])
-
+  },
+  [mesaId, navigate, avisarError]
+)
   return {
     mesa,
     seccion,
