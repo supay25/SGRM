@@ -3,7 +3,8 @@ node_modules/
 
 # Variables de entorno (¡Crítico para Prisma y Express!)
 .env
-.env.local
+.env.production
+.env*.local
 
 # Prisma
 /src/generated/prisma
