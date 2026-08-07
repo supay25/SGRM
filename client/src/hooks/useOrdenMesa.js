@@ -4,9 +4,11 @@ import { getMesa } from '../api/mesas.api'
 import { getProductos } from '../api/productos.api'
 import { getOrdenDeMesa, ingresarOrdenRequest, reiniciarOrdenRequest } from '../api/ordenes.api'
 import { crearFacturaRequest } from '../api/facturas.api'
+import useAvisoError from './useAvisoError'
 
 export default function useOrdenMesa(mesaId) {
   const navigate = useNavigate()
+  const avisarError = useAvisoError()
   const [mesa, setMesa] = useState(null)
   const [catalogo, setCatalogo] = useState([])
   const [categoriaActivaId, setCategoriaActivaId] = useState('todas')
@@ -138,18 +140,18 @@ export default function useOrdenMesa(mesaId) {
       setOrdenGuardadaEnBackend(true)
       navigate('/home')
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al ingresar la orden')
+      avisarError(error, 'Error al ingresar la orden')
     }
-  }, [lineas, mesaId, navigate])
+  }, [lineas, mesaId, navigate, avisarError])
 
   // Reiniciar: descarta cambios locales y vuelve al último estado guardado en el backend
   const reiniciar = useCallback(async () => {
     try {
       await cargarOrden()
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al reiniciar la orden')
+      avisarError(error, 'Error al reiniciar la orden')
     }
-  }, [cargarOrden])
+  }, [cargarOrden, avisarError])
 
   // Vaciar orden: el borrador quedó vacío y había orden guardada → borra la orden en el backend y libera la mesa
   const vaciarOrdenBackend = useCallback(async () => {
@@ -157,9 +159,9 @@ export default function useOrdenMesa(mesaId) {
       await reiniciarOrdenRequest(mesaId)
       navigate('/home')
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al vaciar la orden')
+      avisarError(error, 'Error al vaciar la orden')
     }
-  }, [mesaId, navigate])
+  }, [mesaId, navigate, avisarError])
 
   // true cuando el borrador quedó vacío PERO había orden guardada → toca vaciar en backend
   const debeVaciar = lineas.length === 0 && ordenGuardadaEnBackend
@@ -170,9 +172,9 @@ export default function useOrdenMesa(mesaId) {
       await crearFacturaRequest(Number(mesaId))
       navigate('/home')
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al facturar')
+      avisarError(error, 'Error al facturar')
     }
-  }, [lineas, mesaId, navigate])
+  }, [lineas, mesaId, navigate, avisarError])
 
   return {
     mesa,

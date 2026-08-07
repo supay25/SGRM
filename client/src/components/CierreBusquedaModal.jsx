@@ -26,10 +26,6 @@ export default function CierreBusquedaModal({ fechaBuscada, cierre, hayFacturas,
     return () => document.removeEventListener('keydown', handleEsc)
   }, [onCerrar])
 
-  function handleImprimir() {
-    // TODO: impresión térmica pendiente
-  }
-
   async function handleConfirmarCierre() {
     setCerrando(true)
     setError('')
@@ -133,7 +129,7 @@ export default function CierreBusquedaModal({ fechaBuscada, cierre, hayFacturas,
         </div>
 
         <div className="flex justify-end gap-3 border-t border-line px-6 py-5">
-          {cierre && <BotonImprimir onClick={handleImprimir} />}
+          {cierre && <BotonImprimir />}
           <button
             type="button"
             onClick={onCerrar}

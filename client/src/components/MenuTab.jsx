@@ -3,9 +3,12 @@ import CategoriaListItem from './CategoriaListItem'
 import CategoriaFormModal from './CategoriaFormModal'
 import ProductoMenuCard from './ProductoMenuCard'
 import ProductoFormModal from './ProductoFormModal'
+import ConfirmarAccionModal from './ConfirmarAccionModal'
 import useMenu from '../hooks/useMenu'
+import useAvisoError from '../hooks/useAvisoError'
 
 export default function MenuTab() {
+  const avisarError = useAvisoError()
   const {
     cargando,
     categorias,
@@ -22,6 +25,8 @@ export default function MenuTab() {
 
   const [modalCategoria, setModalCategoria] = useState(null) // null | 'nueva' | categoria
   const [modalProducto, setModalProducto] = useState(null) // null | 'nuevo' | producto
+  const [categoriaAEliminar, setCategoriaAEliminar] = useState(null)
+  const [productoAEliminar, setProductoAEliminar] = useState(null)
 
   const categoriaActiva = categorias.find((categoria) => categoria.id === categoriaActivaId) ?? null
 
@@ -34,17 +39,18 @@ export default function MenuTab() {
     setModalCategoria(null)
   }
 
-  async function handleEliminarCategoria(categoria) {
-    
-    const confirmado = window.confirm(
-      `¿Eliminar la categoría "${categoria.nombre}"? Esta acción no se puede deshacer.`
-    )
-    if (!confirmado) return
+  // El borrado no corre acá: solo abre la confirmación.
+  function handleEliminarCategoria(categoria) {
+    setCategoriaAEliminar(categoria)
+  }
 
+  async function handleConfirmarEliminarCategoria() {
     try {
-      await eliminarCategoria(categoria.id)
+      await eliminarCategoria(categoriaAEliminar.id)
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al eliminar la categoría')
+      avisarError(error, 'Error al eliminar la categoría')
+    } finally {
+      setCategoriaAEliminar(null)
     }
   }
 
@@ -57,15 +63,17 @@ export default function MenuTab() {
     setModalProducto(null)
   }
 
-  async function handleEliminarProducto(producto) {
-    
-    const confirmado = window.confirm(`¿Eliminar "${producto.nombre}" del menú? Esta acción no se puede deshacer.`)
-    if (!confirmado) return
+  function handleEliminarProducto(producto) {
+    setProductoAEliminar(producto)
+  }
 
+  async function handleConfirmarEliminarProducto() {
     try {
-      await eliminarProducto(producto.id)
+      await eliminarProducto(productoAEliminar.id)
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al eliminar el producto')
+      avisarError(error, 'Error al eliminar el producto')
+    } finally {
+      setProductoAEliminar(null)
     }
   }
 
@@ -169,6 +177,26 @@ export default function MenuTab() {
           categoriaSugeridaId={categoriaActivaId}
           onCerrar={() => setModalProducto(null)}
           onGuardar={handleGuardarProducto}
+        />
+      )}
+
+      {categoriaAEliminar && (
+        <ConfirmarAccionModal
+          titulo="Eliminar categoría"
+          mensaje={`¿Eliminar la categoría "${categoriaAEliminar.nombre}"?`}
+          advertencia="Esta acción no se puede deshacer."
+          onCancelar={() => setCategoriaAEliminar(null)}
+          onConfirmar={handleConfirmarEliminarCategoria}
+        />
+      )}
+
+      {productoAEliminar && (
+        <ConfirmarAccionModal
+          titulo="Eliminar producto"
+          mensaje={`¿Eliminar "${productoAEliminar.nombre}" del menú?`}
+          advertencia="Esta acción no se puede deshacer."
+          onCancelar={() => setProductoAEliminar(null)}
+          onConfirmar={handleConfirmarEliminarProducto}
         />
       )}
     </>

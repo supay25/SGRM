@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { getResumenHoyRequest, getCierresRequest, crearCierreRequest } from '../api/cierres.api.js'
+import useAvisoError from './useAvisoError.js'
 
 export default function useCierreCaja() {
+  const avisarError = useAvisoError()
   const [cargando, setCargando] = useState(true)
   const [cerrando, setCerrando] = useState(false)
   const [resumen, setResumen] = useState(null)
@@ -32,11 +34,11 @@ export default function useCierreCaja() {
       await crearCierreRequest()
       await cargar()
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al cerrar la caja')
+      avisarError(error, 'Error al cerrar la caja')
     } finally {
       setCerrando(false)
     }
-  }, [cargar])
+  }, [cargar, avisarError])
 
   return {
     cargando,

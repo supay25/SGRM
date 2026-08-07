@@ -10,35 +10,37 @@ export default function OrdenLinea({ linea, onIncrementar, onDecrementar, onElim
           type="button"
           onClick={() => onDecrementar(linea.productoId)}
           aria-label={`Quitar una unidad de ${linea.nombre}`}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-lg leading-none text-ink transition hover:bg-surface-2 active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border border-line-strong bg-surface-2 text-xl leading-none font-bold text-ink transition hover:border-ember hover:text-ember-light active:scale-95"
         >
           −
         </button>
-        <span className="w-6 text-center text-base font-semibold text-ink">{linea.cantidad}</span>
+        <span className="w-7 text-center text-lg font-bold tabular-nums text-ink">{linea.cantidad}</span>
         <button
           type="button"
           onClick={() => onIncrementar(linea.productoId)}
           aria-label={`Agregar una unidad de ${linea.nombre}`}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-line text-lg leading-none text-ink transition hover:bg-surface-2 active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border border-line-strong bg-surface-2 text-xl leading-none font-bold text-ink transition hover:border-ember hover:text-ember-light active:scale-95"
         >
           +
         </button>
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-base font-semibold leading-snug text-ink">{linea.nombre}</p>
-        <p className="mt-0.5 text-xs text-muted">{formatearColones(linea.precio)} c/u</p>
+        <p className="truncate text-base font-bold leading-snug text-ink">{linea.nombre}</p>
+        <p className="mt-1 text-sm font-medium tabular-nums text-subtle">
+          {formatearColones(linea.precio)} c/u
+        </p>
       </div>
 
-      <div className="flex shrink-0 flex-col items-end gap-2">
-        <span className="text-base font-bold text-ink">{formatearColones(subtotalLinea)}</span>
+      <div className="flex shrink-0 flex-col items-end gap-1.5">
+        <span className="text-lg font-bold tabular-nums text-ink">{formatearColones(subtotalLinea)}</span>
         <button
           type="button"
           onClick={() => onEliminar(linea.productoId)}
           aria-label={`Eliminar ${linea.nombre} de la orden`}
-          className="text-muted transition-colors hover:text-danger"
+          className="rounded-lg p-1.5 text-subtle transition-colors hover:bg-danger/15 hover:text-danger"
         >
-          <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+          <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
             <path
               fillRule="evenodd"
               d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"

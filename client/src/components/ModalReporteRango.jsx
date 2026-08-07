@@ -19,10 +19,6 @@ export default function ModalReporteRango({ titulo, desde, hasta, onCerrar, chil
     return () => document.removeEventListener('keydown', handleEsc)
   }, [onCerrar])
 
-  function handleImprimir() {
-    // TODO: impresión térmica pendiente
-  }
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm px-4"
@@ -45,7 +41,7 @@ export default function ModalReporteRango({ titulo, desde, hasta, onCerrar, chil
         <div className="overflow-y-auto px-6 py-5">{children}</div>
 
         <div className="flex justify-end gap-3 border-t border-line px-6 py-5">
-          <BotonImprimir onClick={handleImprimir} />
+          <BotonImprimir />
           <button
             type="button"
             onClick={onCerrar}

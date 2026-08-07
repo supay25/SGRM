@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { getFacturasRequest, getFacturaDetalleRequest, anularFacturaRequest } from '../api/facturas.api.js'
 import { editarClienteFacturaRequest } from '../api/cliente.api.js'
+import useAvisoError from './useAvisoError.js'
 
 export default function useFacturas() {
+  const avisarError = useAvisoError()
   const [facturas, setFacturas] = useState([])
   const [cargando, setCargando] = useState(true)
   const [facturaSeleccionadaId, setFacturaSeleccionadaId] = useState(null)
@@ -78,10 +80,10 @@ export default function useFacturas() {
         await cargarFacturas()
         if (facturaId === facturaSeleccionadaId) await cargarDetalle(facturaId)
       } catch (error) {
-        alert(error.response?.data?.error || 'Error al anular la factura')
+        avisarError(error, 'Error al anular la factura')
       }
     },
-    [cargarFacturas, cargarDetalle, facturaSeleccionadaId]
+    [cargarFacturas, cargarDetalle, facturaSeleccionadaId, avisarError]
   )
 
   const editarCliente = useCallback(
@@ -91,10 +93,10 @@ export default function useFacturas() {
         await cargarFacturas()
         if (facturaId === facturaSeleccionadaId) await cargarDetalle(facturaId)
       } catch (error) {
-        alert(error.response?.data?.error || 'Error al editar el cliente')
+        avisarError(error, 'Error al editar el cliente')
       }
     },
-    [cargarFacturas, cargarDetalle, facturaSeleccionadaId]
+    [cargarFacturas, cargarDetalle, facturaSeleccionadaId, avisarError]
   )
 
   return {

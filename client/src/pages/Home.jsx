@@ -33,13 +33,6 @@ export default function Home() {
     [mesas, seccionActivaId]
   )
 
-  const conteoPorSeccion = useMemo(() => {
-    return secciones.reduce((acc, seccion) => {
-      acc[seccion.id] = mesas.filter((mesa) => mesa.seccionId === seccion.id).length
-      return acc
-    }, {})
-  }, [mesas, secciones])
-
   const resumenSeccion = useMemo(
     () => ({
       libres: mesasDeLaSeccion.filter((mesa) => mesa.estado === 'LIBRE').length,
@@ -69,25 +62,34 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-page">
-      <Navbar nombreRestaurante="La Buena Mesa" activeLink="home" onLogout={handleLogout} />
+      <Navbar activeLink="home" onLogout={handleLogout} />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="text-2xl font-bold text-ink tracking-tight">Mesas</h1>
-            <p className="mt-1 text-sm text-muted">
-              {seccionActiva?.nombre}
-              {' · '}
-              <span className="text-success font-medium">{resumenSeccion.libres} libres</span>
-              {' · '}
-              <span className="text-danger font-medium">{resumenSeccion.ocupadas} ocupadas</span>
-            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">Mesas</h1>
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+              {seccionActiva?.nombre && (
+                <span className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3 py-1 text-sm font-semibold text-subtle">
+                  <span className={`h-2.5 w-2.5 rounded-full ${seccionActiva.colores.solido}`} />
+                  {seccionActiva.nombre}
+                </span>
+              )}
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-success/15 px-3 py-1 text-sm font-semibold text-success ring-1 ring-success/40">
+                <span className="text-base font-bold tabular-nums">{resumenSeccion.libres}</span>
+                libres
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-danger/15 px-3 py-1 text-sm font-semibold text-danger ring-1 ring-danger/40">
+                <span className="text-base font-bold tabular-nums">{resumenSeccion.ocupadas}</span>
+                ocupadas
+              </span>
+            </div>
           </div>
 
           <button
             type="button"
             onClick={() => setMoverAbierto(true)}
-            className="flex shrink-0 items-center gap-2 rounded-lg border border-line px-3 py-2 text-sm font-semibold text-ink transition hover:bg-surface-2 active:scale-[0.98] sm:px-4"
+            className="flex shrink-0 items-center gap-2 rounded-xl border border-line-strong bg-surface px-3 py-2.5 text-base font-semibold text-ink transition hover:border-ember hover:bg-surface-2 hover:text-ember-light active:scale-[0.98] sm:px-4"
           >
             <svg
               viewBox="0 0 24 24"
@@ -96,7 +98,7 @@ export default function Home() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="h-4 w-4 shrink-0"
+              className="h-5 w-5 shrink-0"
             >
               <path d="M4 8h13l-3-3M20 16H7l3 3" />
             </svg>
@@ -105,23 +107,22 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="mt-6">
+        <div className="mt-7">
           <SeccionTabs
             secciones={secciones}
             seccionActivaId={seccionActivaId}
             onCambiarSeccion={setSeccionActivaId}
-            conteos={conteoPorSeccion}
           />
         </div>
 
         {mesasDeLaSeccion.length === 0 ? (
-          <div className="mt-6 rounded-xl border border-dashed border-line py-16 text-center">
-            <p className="text-muted text-sm">
+          <div className="mt-7 rounded-2xl border-2 border-dashed border-line-strong py-16 text-center">
+            <p className="text-base font-medium text-subtle">
               Todavía no hay mesas en {seccionActiva?.nombre ?? 'esta sección'}.
             </p>
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="mt-7 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {mesasDeLaSeccion.map((mesa) => (
               <MesaCard
                 key={mesa.id}

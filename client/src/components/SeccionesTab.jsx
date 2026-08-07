@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import SeccionFormModal from './SeccionFormModal'
+import ConfirmarAccionModal from './ConfirmarAccionModal'
 import useSecciones from '../hooks/useSecciones'
 
 function Etiqueta({ activa, texto, porcentaje }) {
@@ -20,6 +21,7 @@ export default function SeccionesTab() {
   const { secciones, cargando, agregarSeccion, actualizarSeccion, eliminarSeccion } = useSecciones()
 
   const [modalSeccion, setModalSeccion] = useState(null) // null | 'nueva' | seccion
+  const [seccionAEliminar, setSeccionAEliminar] = useState(null)
   const [error, setError] = useState('')
 
   async function handleGuardarSeccion(datos) {
@@ -31,19 +33,20 @@ export default function SeccionesTab() {
     setModalSeccion(null)
   }
 
-  async function handleEliminarSeccion(seccion) {
-    // TODO: reemplazar por confirmación propia del sistema de diseño
-    const confirmado = window.confirm(
-      `¿Eliminar la sección "${seccion.nombre}"? Esta acción no se puede deshacer.`
-    )
-    if (!confirmado) return
+  // El borrado no corre acá: solo abre la confirmación.
+  function handleEliminarSeccion(seccion) {
+    setSeccionAEliminar(seccion)
+  }
 
+  async function handleConfirmarEliminarSeccion() {
     setError('')
     try {
-      await eliminarSeccion(seccion.id)
+      await eliminarSeccion(seccionAEliminar.id)
     } catch (error) {
       // El backend rechaza la sección cuando todavía tiene mesas asociadas.
       setError(error.response?.data?.error || 'Error al eliminar la sección')
+    } finally {
+      setSeccionAEliminar(null)
     }
   }
 
@@ -120,6 +123,16 @@ export default function SeccionesTab() {
           seccion={modalSeccion === 'nueva' ? null : modalSeccion}
           onCerrar={() => setModalSeccion(null)}
           onGuardar={handleGuardarSeccion}
+        />
+      )}
+
+      {seccionAEliminar && (
+        <ConfirmarAccionModal
+          titulo="Eliminar sección"
+          mensaje={`¿Eliminar la sección "${seccionAEliminar.nombre}"?`}
+          advertencia="Esta acción no se puede deshacer."
+          onCancelar={() => setSeccionAEliminar(null)}
+          onConfirmar={handleConfirmarEliminarSeccion}
         />
       )}
     </>

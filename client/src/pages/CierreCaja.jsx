@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/navbar'
 import ResumenTarjeta from '../components/ResumenTarjeta'
 import ConfirmarCierreModal from '../components/ConfirmarCierreModal'
+import ConfirmarAccionModal from '../components/ConfirmarAccionModal'
 import HistorialCierreCard from '../components/HistorialCierreCard'
 import FacturaCard from '../components/FacturaCard'
 import FacturaDetallePanel from '../components/FacturaDetallePanel'
@@ -28,6 +29,7 @@ export default function CierreCaja() {
   } = useFacturas()
   const [modalAbierto, setModalAbierto] = useState(false)
   const [facturaEditandoCliente, setFacturaEditandoCliente] = useState(null)
+  const [facturaAAnular, setFacturaAAnular] = useState(null)
 
   function handleLogout() {
     // TODO: si se agrega endpoint de logout en el backend, invocarlo aquí antes de limpiar el storage
@@ -42,14 +44,15 @@ export default function CierreCaja() {
     setModalAbierto(false)
   }
 
-  async function handleAnular(factura) {
-    // TODO: reemplazar por confirmación propia del sistema de diseño
-    const confirmado = window.confirm(
-      `¿Anular la factura #${String(factura.numeroFactura).padStart(3, '0')}? Esta acción no se puede deshacer.`
-    )
-    if (!confirmado) return
-    await anularFactura(factura.id)
+  // La anulación no corre acá: solo abre la confirmación.
+  function handleAnular(factura) {
+    setFacturaAAnular(factura)
+  }
+
+  async function handleConfirmarAnular() {
+    await anularFactura(facturaAAnular.id)
     await recargarResumen()
+    setFacturaAAnular(null)
   }
 
   function handleEditarCliente(factura) {
@@ -61,11 +64,6 @@ export default function CierreCaja() {
     setFacturaEditandoCliente(null)
   }
 
-  function handleImprimir(factura) {
-    // TODO: impresión térmica pendiente
-    console.log('Imprimir factura', factura.id)
-  }
-
   const rangoFacturas =
     resumenHoy.cantidad > 0
       ? `#${String(resumenHoy.primeraFactura).padStart(3, '0')} al #${String(resumenHoy.ultimaFactura).padStart(3, '0')}`
@@ -73,7 +71,7 @@ export default function CierreCaja() {
 
   return (
     <div className="min-h-screen bg-page">
-      <Navbar nombreRestaurante="La Buena Mesa" activeLink="caja" onLogout={handleLogout} />
+      <Navbar activeLink="caja" onLogout={handleLogout} />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
         <h1 className="text-2xl font-bold text-ink tracking-tight">Cierre de caja</h1>
@@ -179,7 +177,6 @@ export default function CierreCaja() {
                         onVolver={cerrarDetalle}
                         onAnular={handleAnular}
                         onEditarCliente={handleEditarCliente}
-                        onImprimir={handleImprimir}
                       />
                     )}
                   </div>
@@ -209,6 +206,17 @@ export default function CierreCaja() {
           cerrando={cerrando}
           onCancelar={() => setModalAbierto(false)}
           onConfirmar={handleConfirmarCierre}
+        />
+      )}
+
+      {facturaAAnular && (
+        <ConfirmarAccionModal
+          titulo="Anular factura"
+          mensaje={`¿Anular la factura #${String(facturaAAnular.numeroFactura).padStart(3, '0')}?`}
+          advertencia="Esta acción no se puede deshacer."
+          textoConfirmar="Sí, anular"
+          onCancelar={() => setFacturaAAnular(null)}
+          onConfirmar={handleConfirmarAnular}
         />
       )}
 

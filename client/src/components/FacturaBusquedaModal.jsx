@@ -34,10 +34,6 @@ export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar,
     setModalClienteAbierto(false)
   }
 
-  function handleImprimir() {
-    // TODO: impresión térmica pendiente
-  }
-
   return (
     <>
     <div
@@ -136,7 +132,7 @@ export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar,
               Editar cliente
             </button>
           )}
-          <BotonImprimir onClick={handleImprimir} />
+          <BotonImprimir />
           <button
             type="button"
             onClick={onCerrar}

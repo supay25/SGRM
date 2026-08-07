@@ -7,6 +7,7 @@ import FacturaBusquedaModal from '../components/FacturaBusquedaModal'
 import { editarClienteFacturaRequest } from '../api/cliente.api'
 import { formatearColones } from '../utils/formato'
 import Navbar from '../components/navbar'
+import useAvisoError from '../hooks/useAvisoError'
 
 import {
   getMisVentasRequest,
@@ -21,6 +22,7 @@ import {
 export default function Reportes() {
   // Buscar cierre por fecha (TODO: backend del restaurante)
   const navigate = useNavigate()
+  const avisarError = useAvisoError()
   const [fechaCierre, setFechaCierre] = useState('')
   const [cierreEncontrado, setCierreEncontrado] = useState(null)
   const [fechaCierreBuscada, setFechaCierreBuscada] = useState('')
@@ -78,7 +80,7 @@ export default function Reportes() {
       await editarClienteFacturaRequest(facturaEncontrada.id, nombreCliente)
       setFacturaEncontrada((prev) => ({ ...prev, nombreCliente }))
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al editar el cliente')
+      avisarError(error, 'Error al editar el cliente')
     }
   }
 
@@ -93,7 +95,7 @@ export default function Reportes() {
 
   return (
     <div className="min-h-screen bg-page">
-      <Navbar nombreRestaurante="La Buena Mesa" activeLink="reportes" onLogout={handleLogout} />
+      <Navbar activeLink="reportes" onLogout={handleLogout} />
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <header className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight text-ink">Reportes</h1>

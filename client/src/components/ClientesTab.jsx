@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import ClienteFormModal from './ClienteFormModal'
+import ConfirmarAccionModal from './ConfirmarAccionModal'
 import useClientes from '../hooks/useClientes'
 
 export default function ClientesTab() {
   const { clientes, cargando, agregarCliente, actualizarCliente, eliminarCliente } = useClientes()
 
   const [modalCliente, setModalCliente] = useState(null) // null | 'nuevo' | cliente
+  const [clienteAEliminar, setClienteAEliminar] = useState(null)
   const [busqueda, setBusqueda] = useState('')
   const [error, setError] = useState('')
 
@@ -23,18 +25,19 @@ export default function ClientesTab() {
     setModalCliente(null)
   }
 
-  async function handleEliminarCliente(cliente) {
-    // TODO: reemplazar por confirmación propia del sistema de diseño
-    const confirmado = window.confirm(
-      `¿Eliminar al cliente "${cliente.nombre}"? Esta acción no se puede deshacer.`
-    )
-    if (!confirmado) return
+  // El borrado no corre acá: solo abre la confirmación.
+  function handleEliminarCliente(cliente) {
+    setClienteAEliminar(cliente)
+  }
 
+  async function handleConfirmarEliminarCliente() {
     setError('')
     try {
-      await eliminarCliente(cliente.id)
+      await eliminarCliente(clienteAEliminar.id)
     } catch (error) {
       setError(error.response?.data?.error || 'Error al eliminar el cliente')
+    } finally {
+      setClienteAEliminar(null)
     }
   }
 
@@ -127,6 +130,16 @@ export default function ClientesTab() {
           cliente={modalCliente === 'nuevo' ? null : modalCliente}
           onCerrar={() => setModalCliente(null)}
           onGuardar={handleGuardarCliente}
+        />
+      )}
+
+      {clienteAEliminar && (
+        <ConfirmarAccionModal
+          titulo="Eliminar cliente"
+          mensaje={`¿Eliminar al cliente "${clienteAEliminar.nombre}"?`}
+          advertencia="Esta acción no se puede deshacer."
+          onCancelar={() => setClienteAEliminar(null)}
+          onConfirmar={handleConfirmarEliminarCliente}
         />
       )}
     </>

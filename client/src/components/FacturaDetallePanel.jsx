@@ -1,3 +1,4 @@
+import useAvisoImpresion from '../hooks/useAvisoImpresion'
 import { formatearColones } from '../utils/formato'
 
 function formatearNumero(numeroFactura) {
@@ -13,7 +14,10 @@ function formatearFechaHora(fecha) {
   })
 }
 
-export default function FacturaDetallePanel({ factura, cargando, onVolver, onAnular, onEditarCliente, onImprimir }) {
+export default function FacturaDetallePanel({ factura, cargando, onVolver, onAnular, onEditarCliente }) {
+  // La impresión térmica está pendiente: por ahora solo avisa.
+  const avisarImpresionPendiente = useAvisoImpresion()
+
   if (cargando || !factura) {
     return (
       <div className="flex h-full min-h-60 items-center justify-center rounded-xl border border-line bg-surface text-muted">
@@ -120,7 +124,7 @@ export default function FacturaDetallePanel({ factura, cargando, onVolver, onAnu
         )}
         <button
           type="button"
-          onClick={() => onImprimir(factura)}
+          onClick={avisarImpresionPendiente}
           className="inline-flex items-center justify-center gap-2 rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-muted transition hover:bg-surface-2 hover:text-ink active:scale-[0.98]"
         >
           Imprimir

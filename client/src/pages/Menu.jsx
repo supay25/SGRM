@@ -5,10 +5,13 @@ import CategoriaListItem from '../components/CategoriaListItem'
 import CategoriaFormModal from '../components/CategoriaFormModal'
 import ProductoMenuCard from '../components/ProductoMenuCard'
 import ProductoFormModal from '../components/ProductoFormModal'
+import ConfirmarAccionModal from '../components/ConfirmarAccionModal'
 import useMenu from '../hooks/useMenu'
+import useAvisoError from '../hooks/useAvisoError'
 
 export default function Menu() {
   const navigate = useNavigate()
+  const avisarError = useAvisoError()
   const {
     cargando,
     categorias,
@@ -25,6 +28,8 @@ export default function Menu() {
 
   const [modalCategoria, setModalCategoria] = useState(null) // null | 'nueva' | categoria
   const [modalProducto, setModalProducto] = useState(null) // null | 'nuevo' | producto
+  const [categoriaAEliminar, setCategoriaAEliminar] = useState(null)
+  const [productoAEliminar, setProductoAEliminar] = useState(null)
 
   const categoriaActiva = categorias.find((categoria) => categoria.id === categoriaActivaId) ?? null
 
@@ -45,17 +50,18 @@ export default function Menu() {
     setModalCategoria(null)
   }
 
-  async function handleEliminarCategoria(categoria) {
-    // TODO: reemplazar por confirmación propia del sistema de diseño
-    const confirmado = window.confirm(
-      `¿Eliminar la categoría "${categoria.nombre}"? Esta acción no se puede deshacer.`
-    )
-    if (!confirmado) return
+  // El borrado no corre acá: solo abre la confirmación.
+  function handleEliminarCategoria(categoria) {
+    setCategoriaAEliminar(categoria)
+  }
 
+  async function handleConfirmarEliminarCategoria() {
     try {
-      await eliminarCategoria(categoria.id)
+      await eliminarCategoria(categoriaAEliminar.id)
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al eliminar la categoría')
+      avisarError(error, 'Error al eliminar la categoría')
+    } finally {
+      setCategoriaAEliminar(null)
     }
   }
 
@@ -68,21 +74,23 @@ export default function Menu() {
     setModalProducto(null)
   }
 
-  async function handleEliminarProducto(producto) {
-    // TODO: reemplazar por confirmación propia del sistema de diseño
-    const confirmado = window.confirm(`¿Eliminar "${producto.nombre}" del menú? Esta acción no se puede deshacer.`)
-    if (!confirmado) return
+  function handleEliminarProducto(producto) {
+    setProductoAEliminar(producto)
+  }
 
+  async function handleConfirmarEliminarProducto() {
     try {
-      await eliminarProducto(producto.id)
+      await eliminarProducto(productoAEliminar.id)
     } catch (error) {
-      alert(error.response?.data?.error || 'Error al eliminar el producto')
+      avisarError(error, 'Error al eliminar el producto')
+    } finally {
+      setProductoAEliminar(null)
     }
   }
 
   return (
     <div className="min-h-screen bg-page">
-      <Navbar nombreRestaurante="La Buena Mesa" activeLink="menu" onLogout={handleLogout} />
+      <Navbar activeLink="menu" onLogout={handleLogout} />
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
         <div>
@@ -187,6 +195,26 @@ export default function Menu() {
           categoriaSugeridaId={categoriaActivaId}
           onCerrar={() => setModalProducto(null)}
           onGuardar={handleGuardarProducto}
+        />
+      )}
+
+      {categoriaAEliminar && (
+        <ConfirmarAccionModal
+          titulo="Eliminar categoría"
+          mensaje={`¿Eliminar la categoría "${categoriaAEliminar.nombre}"?`}
+          advertencia="Esta acción no se puede deshacer."
+          onCancelar={() => setCategoriaAEliminar(null)}
+          onConfirmar={handleConfirmarEliminarCategoria}
+        />
+      )}
+
+      {productoAEliminar && (
+        <ConfirmarAccionModal
+          titulo="Eliminar producto"
+          mensaje={`¿Eliminar "${productoAEliminar.nombre}" del menú?`}
+          advertencia="Esta acción no se puede deshacer."
+          onCancelar={() => setProductoAEliminar(null)}
+          onConfirmar={handleConfirmarEliminarProducto}
         />
       )}
     </div>

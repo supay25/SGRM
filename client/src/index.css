@@ -5,11 +5,76 @@
   --color-page: #1c1917;
   --color-surface: #292524;
   --color-surface-2: #44403c;
+  /* Superficie elevada: tarjetas que deben despegarse del fondo de página */
+  --color-surface-3: #57534e;
   --color-line: #57534e;
+  /* Borde de alto contraste para elementos que no se pueden perder en el fondo */
+  --color-line-strong: #857f7a;
   --color-ink: #f4f4f5;
+  /* Texto secundario legible (el muted queda para datos de apoyo) */
+  --color-subtle: #d6d3d1;
   --color-muted: #a8a29e;
   --color-ember: #d97706;
+  /* Variante clara del acento: para texto/íconos sobre fondo oscuro */
+  --color-ember-light: #f59e0b;
   --color-ember-dark: #b45309;
   --color-success: #34d399;
   --color-danger: #fb7185;
+}
+
+/* Entrada de los avisos (toast): breve y sin rebote */
+@keyframes sgrm-aviso-entra {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animacion-toast {
+  animation: sgrm-aviso-entra 180ms ease-out;
+}
+
+/* Barra de desplazamiento de las tiras de tabs: fina y acorde al tema oscuro */
+.scrollbar-tabs {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+  scroll-behavior: smooth;
+  /* Deja que el pulgar de la barra respire sin pegarse a los tabs */
+  padding-bottom: 0.5rem;
+}
+
+.scrollbar-tabs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-tabs::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background-color: var(--color-line-strong);
+  transition: background-color 150ms ease-out;
+}
+
+.scrollbar-tabs:hover {
+  scrollbar-color: var(--color-ember) transparent;
+}
+
+.scrollbar-tabs:hover::-webkit-scrollbar-thumb {
+  background-color: var(--color-ember);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animacion-toast {
+    animation: none;
+  }
+
+  .scrollbar-tabs {
+    scroll-behavior: auto;
+  }
 }

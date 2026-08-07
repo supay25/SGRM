@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import MesaFormModal from './MesaFormModal'
+import ConfirmarAccionModal from './ConfirmarAccionModal'
 import useMesas from '../hooks/useMesas'
 
 export default function MesasTab() {
@@ -8,6 +9,7 @@ export default function MesasTab() {
 
   const [modalAbierto, setModalAbierto] = useState(false)
   const [mesaEnEdicion, setMesaEnEdicion] = useState(null)
+  const [mesaAEliminar, setMesaAEliminar] = useState(null)
   const [filtroSeccionId, setFiltroSeccionId] = useState('todas')
 
   const seccionesVisibles = useMemo(
@@ -32,9 +34,14 @@ export default function MesasTab() {
     setModalAbierto(true)
   }
 
+  // El borrado no corre acá: solo abre la confirmación.
   function handleEliminarMesa(mesa) {
-    const confirmado = window.confirm(`¿Eliminar "${mesa.nombre}"? Esta acción no se puede deshacer.`)
-    if (confirmado) eliminarMesa(mesa.id)
+    setMesaAEliminar(mesa)
+  }
+
+  async function handleConfirmarEliminarMesa() {
+    await eliminarMesa(mesaAEliminar.id)
+    setMesaAEliminar(null)
   }
 
   function handleGuardarMesa(datos) {
@@ -166,6 +173,16 @@ export default function MesasTab() {
             setMesaEnEdicion(null)
           }}
           onGuardar={handleGuardarMesa}
+        />
+      )}
+
+      {mesaAEliminar && (
+        <ConfirmarAccionModal
+          titulo="Eliminar mesa"
+          mensaje={`¿Eliminar "${mesaAEliminar.nombre}"?`}
+          advertencia="Esta acción no se puede deshacer."
+          onCancelar={() => setMesaAEliminar(null)}
+          onConfirmar={handleConfirmarEliminarMesa}
         />
       )}
     </>
