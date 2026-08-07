@@ -1,5 +1,6 @@
 import prisma from '../config/db.js';
-import { Prisma } from '@prisma/client';
+import pkg from '@prisma/client';
+const { Prisma } = pkg;
 
 function armarRango(desde, hasta) {
   const inicio = new Date(`${desde}T00:00:00.000Z`);

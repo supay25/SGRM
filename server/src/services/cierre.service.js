@@ -1,6 +1,6 @@
 import prisma from '../config/db.js';
-import { Prisma } from '@prisma/client';
-
+import pkg from '@prisma/client';
+const { Prisma } = pkg;
 export const crearCierre = async (restaurantId, fechaStr = null) => {
   const esHoy = !fechaStr;
 

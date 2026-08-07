@@ -1,5 +1,6 @@
 import prisma from '../config/db.js';
-import { Prisma } from '@prisma/client';
+import pkg from '@prisma/client';
+const { Prisma } = pkg;
 
 export const crearFactura = async (restaurantId, mesaId, descuento = 0, nombreCliente = 'Cliente al contado') => {
   const orden = await prisma.orden.findFirst({
