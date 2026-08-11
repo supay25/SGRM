@@ -47,11 +47,11 @@ export default function CategoriaTabs({ categorias, categoriaActivaId, onCambiar
   }, [categoriaActivaId, categorias])
 
   return (
-    <div className="relative -mx-1">
+    <div className="relative -mx-1 min-w-0">
       <div
         ref={contenedorRef}
         onScroll={actualizarBordes}
-        className="scrollbar-tabs flex gap-2.5 overflow-x-auto px-1"
+        className="scrollbar-tabs flex gap-2.5 overflow-x-auto px-1 pb-1"
       >
         {categorias.map((categoria) => {
           const activa = categoria.id === categoriaActivaId
@@ -63,7 +63,8 @@ export default function CategoriaTabs({ categorias, categoriaActivaId, onCambiar
               data-activa={activa}
               onClick={() => onCambiarCategoria(categoria.id)}
               className={`
-                flex shrink-0 items-center gap-2.5 rounded-xl border px-5 py-3 text-base font-semibold
+                flex min-h-12 shrink-0 items-center gap-2.5 whitespace-nowrap rounded-xl border
+                px-5 py-3 text-base font-semibold
                 transition-all duration-200 ease-out
                 ${
                   activa
@@ -90,17 +91,43 @@ export default function CategoriaTabs({ categorias, categoriaActivaId, onCambiar
       <span
         aria-hidden="true"
         className={`
-          pointer-events-none absolute inset-y-0 left-0 w-12 bg-linear-to-r from-page to-transparent
+          pointer-events-none absolute inset-y-0 left-0 flex w-14 items-center justify-start pb-1
+          bg-linear-to-r from-page via-page/85 to-transparent
           transition-opacity duration-200 ${hayMasIzquierda ? 'opacity-100' : 'opacity-0'}
         `}
-      />
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-5 w-5 shrink-0 text-subtle"
+        >
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+      </span>
       <span
         aria-hidden="true"
         className={`
-          pointer-events-none absolute inset-y-0 right-0 w-12 bg-linear-to-l from-page to-transparent
+          pointer-events-none absolute inset-y-0 right-0 flex w-14 items-center justify-end pb-1
+          bg-linear-to-l from-page via-page/85 to-transparent
           transition-opacity duration-200 ${hayMasDerecha ? 'opacity-100' : 'opacity-0'}
         `}
-      />
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-5 w-5 shrink-0 text-subtle"
+        >
+          <path d="M9 18l6-6-6-6" />
+        </svg>
+      </span>
     </div>
   )
 }

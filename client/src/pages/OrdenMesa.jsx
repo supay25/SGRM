@@ -63,9 +63,11 @@ export default function OrdenMesa() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-page md:h-screen md:overflow-hidden md:flex-row">
-      {/* COLUMNA IZQUIERDA — la orden */}
-      <aside className="flex w-full shrink-0 flex-col border-b border-line-strong bg-surface md:h-full md:w-[38%] md:min-h-0 md:border-b-0 md:border-r xl:w-[35%]">
+    <div className="flex min-h-screen flex-col bg-page lg:h-screen lg:overflow-hidden lg:flex-row">
+      {/* COLUMNA IZQUIERDA — la orden.
+          Las dos columnas arrancan en lg: en md la izquierda quedaba tan angosta
+          que los botones y los totales no respiraban. */}
+      <aside className="flex w-full min-w-0 shrink-0 flex-col border-b border-line-strong bg-surface lg:h-full lg:w-[40%] lg:min-h-0 lg:border-b-0 lg:border-r xl:w-[36%] 2xl:w-[32%]">
         <div className="shrink-0 border-b border-line-strong p-4">
           <button
             type="button"
@@ -107,7 +109,7 @@ export default function OrdenMesa() {
           </div>
         </div>
 
-        <div className="md:flex-1 md:min-h-0 md:overflow-y-auto">
+        <div className="lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
           {hayProductos ? (
             <div className="px-4">
               {lineas.map((linea) => (
@@ -149,15 +151,21 @@ export default function OrdenMesa() {
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          {/* En columnas angostas los dos botones se apilan: en una sola fila
+              quedaban apretados y con el texto partido. */}
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <button
               type="button"
               onClick={reiniciar}
               disabled={reiniciando}
               title="Descarta los cambios no ingresados y vuelve a lo guardado"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-line-strong bg-surface-2 px-4 py-3.5 text-base font-semibold text-subtle transition hover:border-ink/40 hover:text-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-line-strong disabled:hover:text-subtle"
+              className="inline-flex min-h-14 items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-line-strong bg-surface-2 px-4 py-3.5 text-base font-semibold text-subtle transition hover:border-ink/40 hover:text-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-line-strong disabled:hover:text-subtle"
             >
-              <svg viewBox="0 0 20 20" fill="currentColor" className={`h-5 w-5 ${reiniciando ? 'animate-spin' : ''}`}>
+              <svg
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className={`h-5 w-5 shrink-0 ${reiniciando ? 'animate-spin' : ''}`}
+              >
                 <path
                   fillRule="evenodd"
                   d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 002.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0112.88 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z"
@@ -172,7 +180,7 @@ export default function OrdenMesa() {
                 type="button"
                 onClick={vaciarOrdenBackend}
                 title="La orden quedó vacía: libera la mesa"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-danger px-4 py-3.5 text-base font-bold text-danger transition hover:bg-danger/15 active:scale-[0.98]"
+                className="inline-flex min-h-14 items-center justify-center gap-2 whitespace-nowrap rounded-xl border-2 border-danger px-4 py-3.5 text-base font-bold text-danger transition hover:bg-danger/15 active:scale-[0.98]"
               >
                 Vaciar orden
               </button>
@@ -181,7 +189,7 @@ export default function OrdenMesa() {
                 type="button"
                 onClick={ingresarOrden}
                 disabled={!hayProductos}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-ember px-4 py-3.5 text-base font-bold text-ember-light transition hover:bg-ember/15 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                className="inline-flex min-h-14 items-center justify-center gap-2 whitespace-nowrap rounded-xl border-2 border-ember px-4 py-3.5 text-base font-bold text-ember-light transition hover:bg-ember/15 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
               >
                 Ingresar orden
               </button>
@@ -202,8 +210,8 @@ export default function OrdenMesa() {
         </div>
       </aside>
       {/* COLUMNA DERECHA — el catálogo */}
-      <main className="flex flex-1 flex-col md:h-full md:min-h-0">
-        <div className="shrink-0 border-b border-line p-4">
+      <main className="flex min-w-0 flex-1 flex-col lg:h-full lg:min-h-0">
+        <div className="min-w-0 shrink-0 border-b border-line p-4">
           <CategoriaTabs
             categorias={categorias}
             categoriaActivaId={categoriaActivaId}
@@ -212,8 +220,8 @@ export default function OrdenMesa() {
           />
         </div>
 
-        <div className="p-4 md:flex-1 md:min-h-0 md:overflow-y-auto">
-          <div className="grid grid-cols-2 gap-4 xl:grid-cols-3">
+        <div className="p-4 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-4">
             {productosFiltrados.map((producto) => (
               <ProductoCard
                 key={producto.id}

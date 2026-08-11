@@ -6,7 +6,8 @@ export default function ProductoCard({ producto, cantidadEnBorrador = 0, onAgreg
       type="button"
       onClick={() => onAgregar(producto)}
       className={`
-        relative flex min-h-36 flex-col justify-between rounded-2xl border-2 p-4 text-left
+        relative flex min-h-32 min-w-0 flex-col justify-between rounded-2xl border-2 p-3 text-left
+        sm:min-h-36 sm:p-4
         transition-all duration-200 ease-out active:scale-[0.97]
         ${
           cantidadEnBorrador > 0
@@ -20,8 +21,10 @@ export default function ProductoCard({ producto, cantidadEnBorrador = 0, onAgreg
           {cantidadEnBorrador}
         </span>
       )}
-      <span className="text-xl font-bold leading-snug tracking-tight text-ink">{producto.nombre}</span>
-      <span className="mt-3 text-lg font-bold tabular-nums text-ember-light">
+      <span className="wrap-break-word text-lg font-bold leading-snug tracking-tight text-ink sm:text-xl">
+        {producto.nombre}
+      </span>
+      <span className="mt-3 text-base font-bold tabular-nums text-ember-light sm:text-lg">
         {formatearColones(producto.precio)}
       </span>
     </button>
