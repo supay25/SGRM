@@ -2,7 +2,7 @@ import { crearFactura, listarFacturas ,editarClienteFactura , anularFactura, fac
 
 export const crear = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId =req.restaurantId;
     const { mesaId, descuento, nombreCliente } = req.body;
     const factura = await crearFactura(restaurantId, Number(mesaId), Number(descuento) || 0, nombreCliente);
     res.status(201).json(factura);
@@ -13,7 +13,7 @@ export const crear = async (req, res) => {
 
 export const listar = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const facturas = await listarFacturas(restaurantId);
     res.status(200).json(facturas);
   } catch (error) {
@@ -25,7 +25,7 @@ export const listar = async (req, res) => {
 
 export const anular = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { id } = req.params;;
     const factura = await anularFactura(restaurantId, Number(id));
     res.status(200).json(factura);
@@ -38,7 +38,7 @@ export const anular = async (req, res) => {
 
 export const obtener = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { id } = req.params;
     const factura = await obtenerFactura(restaurantId, Number(id));
     res.status(200).json(factura);
@@ -50,7 +50,7 @@ export const obtener = async (req, res) => {
 
 export const editarCliente = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { id } = req.params;
     const { nombreCliente } = req.body;
     const factura = await editarClienteFactura(restaurantId, Number(id), nombreCliente);
@@ -65,7 +65,7 @@ export const editarCliente = async (req, res) => {
 
 export const facturarDividido = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { mesaId, items, descuento, nombreCliente } = req.body;
     const factura = await facturarParcial(restaurantId, Number(mesaId), items, Number(descuento) || 0, nombreCliente);
     res.status(201).json(factura);

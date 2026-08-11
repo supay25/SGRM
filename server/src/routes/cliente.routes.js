@@ -1,11 +1,12 @@
 // cliente.routes.js
 import { Router } from 'express';
 import { listar, crear, actualizar, eliminar } from '../controllers/cliente.controller.js';
-import { verificarToken } from '../middleware/auth.middleware.js';
+import { verificarToken,soloRestaurante } from '../middleware/auth.middleware.js';
 
 const router = Router();
-router.get('/', verificarToken, listar);
-router.post('/', verificarToken, crear);
-router.put('/:id', verificarToken, actualizar);
-router.delete('/:id', verificarToken, eliminar);
+router.use(verificarToken, soloRestaurante);
+router.get('/', listar);
+router.post('/', crear);
+router.put('/:id', actualizar);
+router.delete('/:id', eliminar);
 export default router;

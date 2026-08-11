@@ -1,12 +1,13 @@
 // cierre.routes.js
 import { Router } from 'express';
 import { crear, listar, reporte, reporteDia } from '../controllers/cierre.controller.js';
-import { verificarToken } from '../middleware/auth.middleware.js';
+import { verificarToken,soloRestaurante } from '../middleware/auth.middleware.js';
 
 const router = Router();
-router.post('/', verificarToken, crear);
-router.get('/', verificarToken, listar);
-router.get('/resumen-hoy', verificarToken, reporteDia);
-router.get('/:id/reporte', verificarToken, reporte);
+router.use(verificarToken, soloRestaurante);
+router.post('/', crear);
+router.get('/', listar);
+router.get('/resumen-hoy', reporteDia);
+router.get('/:id/reporte', reporte);
 
 export default router;

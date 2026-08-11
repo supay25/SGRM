@@ -1,10 +1,14 @@
 import { Router } from 'express';
 import {crear, listar, actualizar, eliminar} from '../controllers/producto.controller.js';
-import {verificarToken} from '../middleware/auth.middleware.js'
+import {verificarToken, soloRestaurante} from '../middleware/auth.middleware.js'
+
+
 const router= Router();
 
-router.post('/', verificarToken, crear);
-router.get('/', verificarToken, listar);
-router.put('/:id', verificarToken, actualizar );
-router.delete('/:id', verificarToken, eliminar)
+router.use(verificarToken, soloRestaurante);
+
+router.post('/', crear);
+router.get('/', listar);
+router.put('/:id', actualizar );
+router.delete('/:id', eliminar)
 export default router;

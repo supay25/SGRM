@@ -2,7 +2,7 @@ import {crearCategoria, listarCategorias, actualizarCategoria, eliminarCategoria
 
 export const crear = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id; 
+    const restaurantId = req.restaurantId; 
     const categoria = await crearCategoria(restaurantId, req.body);
     res.status(201).json(categoria);
   } catch (error) {
@@ -13,7 +13,7 @@ export const crear = async (req, res) => {
 
 export const listar = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const categoria = await listarCategorias(restaurantId);
     res.status(200).json(categoria);
   } catch (error) {
@@ -25,7 +25,7 @@ export const actualizar = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const categoria = await actualizarCategoria(Number(id), restaurantId, req.body)
     res.status(200).json(categoria);
   } catch (error) {
@@ -38,7 +38,7 @@ export const actualizar = async (req, res) => {
 export const eliminar = async (req, res) => {
   const { id } = req.params;
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const categoria = await eliminarCategoria(Number(id), restaurantId)
     res.status(200).json({
       mensaje: "Categoria eliminada correctamente",

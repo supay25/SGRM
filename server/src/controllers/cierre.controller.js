@@ -3,7 +3,7 @@ import { crearCierre, obtenerReporteCierre, listarCierres, resumenDelDia } from 
 
 export const crear = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { fecha } = req.body || {};
     const cierre = await crearCierre(restaurantId, fecha || null);
     res.status(201).json(cierre);
@@ -13,7 +13,7 @@ export const crear = async (req, res) => {
 };
 export const listar = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const cierres = await listarCierres(restaurantId);
     res.status(200).json(cierres);
   } catch (error) {
@@ -23,7 +23,7 @@ export const listar = async (req, res) => {
 
 export const reporte = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { id } = req.params;
     const data = await obtenerReporteCierre(restaurantId, Number(id));
     res.status(200).json(data);
@@ -35,7 +35,7 @@ export const reporte = async (req, res) => {
 
 export const reporteDia = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { id } = req.params;
     const data = await resumenDelDia(restaurantId, Number(id));
     res.status(200).json(data);

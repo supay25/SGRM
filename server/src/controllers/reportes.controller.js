@@ -10,7 +10,7 @@ import {
 
 export const misVentas = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { desde, hasta } = req.query;
     const data = await ventasRango(restaurantId, desde, hasta);
     res.status(200).json(data);
@@ -22,7 +22,7 @@ export const misVentas = async (req, res) => {
 
 export const misServicio = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { desde, hasta } = req.query;
     const data = await servicioRango(restaurantId, desde, hasta);
     res.status(200).json(data);
@@ -34,7 +34,7 @@ export const misServicio = async (req, res) => {
 
 export const misProductos = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { desde, hasta } = req.query;
     const data = await productosPorCategoriaRango(restaurantId, desde, hasta);
     res.status(200).json(data);
@@ -45,7 +45,7 @@ export const misProductos = async (req, res) => {
 
 export const misConsecutivo = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { desde, hasta } = req.query;
     const data = await consecutivoRango(restaurantId, desde, hasta);
     res.status(200).json(data);
@@ -56,7 +56,7 @@ export const misConsecutivo = async (req, res) => {
 
 export const misBuscarCierre = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const data = await buscarCierrePorFecha(restaurantId, req.query.fecha);
     res.status(200).json(data);
   } catch (error) {
@@ -66,7 +66,7 @@ export const misBuscarCierre = async (req, res) => {
 
 export const misBuscarFactura = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const data = await buscarFacturaPorNumero(restaurantId, Number(req.params.numero));
     res.status(200).json(data);
   } catch (error) {

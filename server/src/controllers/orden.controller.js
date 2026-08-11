@@ -2,7 +2,7 @@ import { obtenerOrdenActivaDeMesa, agregarProductoAOrden,moverEntreMesas, elimin
 
 export const verOrden = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { mesaId } = req.params;
     const orden = await obtenerOrdenActivaDeMesa(restaurantId, Number(mesaId));
     res.status(200).json(orden);
@@ -13,7 +13,7 @@ export const verOrden = async (req, res) => {
 
 export const agregarProducto = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { mesaId } = req.params;
     const { productoId, cantidad } = req.body;
     const orden = await agregarProductoAOrden(restaurantId, Number(mesaId), productoId, cantidad);
@@ -25,7 +25,7 @@ export const agregarProducto = async (req, res) => {
 
 export const quitarProducto = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { ordenItemId } = req.params;
     const orden = await eliminarProductoOrden(Number(ordenItemId), restaurantId);
     res.status(200).json(orden);
@@ -37,7 +37,7 @@ export const quitarProducto = async (req, res) => {
 
 export const reiniciar = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { mesaId } = req.params;
     const resultado = await vaciarOrden(restaurantId, Number(mesaId));
     res.status(200).json(resultado);
@@ -51,7 +51,7 @@ export const reiniciar = async (req, res) => {
 // orden.controller.js — agregar:
 export const ingresar = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { mesaId } = req.params;
     const { items } = req.body; // [{ productoId, cantidad }, ...]
     const orden = await ingresarOrden(restaurantId, Number(mesaId), items);
@@ -64,7 +64,7 @@ export const ingresar = async (req, res) => {
 
 export const mover = async (req, res) => {
   try {
-    const restaurantId = req.usuario.id;
+    const restaurantId = req.restaurantId;
     const { mesaOrigenId, mesaDestinoId, itemsOrigen, itemsDestino } = req.body;
     const resultado = await moverEntreMesas(
       restaurantId,

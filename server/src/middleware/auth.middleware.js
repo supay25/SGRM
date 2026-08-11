@@ -41,3 +41,12 @@ export const soloSuperAdmin = (req, res, next) => {
   }
   next();
 };
+
+
+export const soloRestaurante = (req, res, next) => {
+  if (req.usuario.type !== 'RESTAURANT') {
+    return res.status(403).json({ error: 'No autorizado' });
+  }
+  req.restaurantId = req.usuario.id;
+  next();
+};
