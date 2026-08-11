@@ -1,19 +1,17 @@
 import prisma from '../config/db.js';
 import pkg from '@prisma/client';
+import { fechaNegocioHoy, rangoDelDia, fechaCierre } from '../utils/fechas.js';
 const { Prisma } = pkg;
 
 function armarRango(desde, hasta) {
-  const inicio = new Date(`${desde}T00:00:00.000Z`);
-  const fin = new Date(`${hasta}T23:59:59.999Z`);
-  return { inicio, fin };
+  return {
+    inicio: rangoDelDia(desde).inicio,
+    fin: rangoDelDia(hasta).fin,
+  };
 }
 
 function rangoHoy() {
-  const inicio = new Date();
-  inicio.setHours(0, 0, 0, 0);
-  const fin = new Date();
-  fin.setHours(23, 59, 59, 999);
-  return { inicio, fin };
+  return rangoDelDia(fechaNegocioHoy());
 }
 
 // ── Resumen del día ──
@@ -37,12 +35,12 @@ export const metricas = async (restaurantId, desde = null, hasta = null) => {
   // Rango: si no viene, últimos 30 días
   let inicio, fin;
   if (desde && hasta) {
-    inicio = new Date(`${desde}T00:00:00.000Z`);
-    fin = new Date(`${hasta}T23:59:59.999Z`);
+    ({ inicio, fin } = armarRango(desde, hasta));
   } else {
-    fin = new Date();
-    inicio = new Date();
-    inicio.setDate(inicio.getDate() - 30);
+    const hoy = fechaNegocioHoy();
+    const d = new Date(`${hoy}T12:00:00.000Z`);
+    d.setUTCDate(d.getUTCDate() - 30);
+    ({ inicio, fin } = armarRango(d.toISOString().slice(0, 10), hoy));
   }
 
   const filtroFecha = { fecha: { gte: inicio, lte: fin } };
@@ -104,9 +102,8 @@ export const facturas = async (restaurantId) => {
 
 // ── Buscar cierre por fecha ──
 export const buscarCierrePorFecha = async (restaurantId, fecha) => {
-  const inicio = new Date(`${fecha}T00:00:00.000Z`);
-  const fin = new Date(`${fecha}T23:59:59.999Z`);
-  const dia = new Date(`${fecha}T00:00:00.000Z`);
+  const { inicio, fin } = rangoDelDia(fecha);
+  const dia = fechaCierre(fecha);
 
   const [cierre, cantidadFacturas] = await Promise.all([
     prisma.cierre.findFirst({ where: { restaurantId, fecha: dia } }),
@@ -115,11 +112,9 @@ export const buscarCierrePorFecha = async (restaurantId, fecha) => {
     }),
   ]);
 
-  return {
-    cierre,
-    hayFacturas: cantidadFacturas > 0,
-  };
+  return { cierre, hayFacturas: cantidadFacturas > 0 };
 };
+
 
 // ── Buscar factura por número ──
 export const buscarFacturaPorNumero = async (restaurantId, numFactura) => {

@@ -20,7 +20,8 @@ import adminRoutes from './routes/admin/admin.routes.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
+app.set('trust proxy', 1);
+const PORT = process.env.PORT || 3000;
 
 // Middlewares
 const origenesPermitidos = [

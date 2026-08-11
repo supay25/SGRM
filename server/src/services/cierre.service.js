@@ -1,26 +1,19 @@
 import prisma from '../config/db.js';
 import pkg from '@prisma/client';
 const { Prisma } = pkg;
+import { fechaNegocioHoy, rangoDelDia, fechaCierre } from '../utils/fechas.js';
+
 export const crearCierre = async (restaurantId, fechaStr = null) => {
-  const esHoy = !fechaStr;
+  const hoy = fechaNegocioHoy();
+  const fecha = fechaStr ?? hoy;   // siempre 'YYYY-MM-DD'
+  const esHoy = fecha === hoy;
 
-  // Día a cerrar: hoy si no viene fecha, o la fecha dada
-  let dia;
-  if (esHoy) {
-    dia = new Date();
-    dia.setHours(0, 0, 0, 0);
-  } else {
-    dia = new Date(`${fechaStr}T00:00:00.000Z`);
-  }
-
-
-  const hoyInicio = new Date();
-  hoyInicio.setUTCHours(0, 0, 0, 0);
-  if (dia > hoyInicio) {
+  if (fecha > hoy) {
     throw new Error('No se puede cerrar un día que aún no ha llegado');
   }
 
   // 1. ¿Ya se cerró ese día?
+  const dia = fechaCierre(fecha);
   const cierreExistente = await prisma.cierre.findFirst({
     where: { restaurantId, fecha: dia },
   });
@@ -34,20 +27,13 @@ export const crearCierre = async (restaurantId, fechaStr = null) => {
     }
   }
 
-  // 3. Traer las facturas de ese día
-  const inicioDia = new Date(dia);
-  const finDia = new Date(dia);
-  if (esHoy) {
-    finDia.setHours(23, 59, 59, 999);
-  } else {
-    finDia.setUTCHours(23, 59, 59, 999);
-  }
-
+  // 3. Traer las facturas de ese día (rango en hora del restaurante)
+  const { inicio, fin } = rangoDelDia(fecha);
   const facturas = await prisma.factura.findMany({
     where: {
       restaurantId,
       anulada: false,
-      fecha: { gte: inicioDia, lte: finDia },
+      fecha: { gte: inicio, lte: fin },
     },
     orderBy: { numeroFactura: 'asc' },
   });
@@ -79,7 +65,7 @@ export const crearCierre = async (restaurantId, fechaStr = null) => {
   return cierre;
 };
 
-
+// Trae los datos completos de un cierre para el reporte: el cierre + los anulados de ese día
 // Trae los datos completos de un cierre para el reporte: el cierre + los anulados de ese día
 export const obtenerReporteCierre = async (restaurantId, cierreId) => {
   const cierre = await prisma.cierre.findFirst({
@@ -87,21 +73,18 @@ export const obtenerReporteCierre = async (restaurantId, cierreId) => {
   });
   if (!cierre) throw new Error('Cierre no encontrado');
 
-  // Los anulados de esa fecha (consulta aparte, Opción A)
-  const inicioDia = new Date(cierre.fecha);
-  const finDia = new Date(cierre.fecha);
-  finDia.setHours(23, 59, 59, 999);
+  // cierre.fecha viene de una columna @db.Date → medianoche UTC; la pasamos a 'YYYY-MM-DD'
+  const { inicio, fin } = rangoDelDia(cierre.fecha.toISOString().slice(0, 10));
 
   const anulados = await prisma.itemAnulado.findMany({
     where: {
       restaurantId,
-      fecha: { gte: inicioDia, lte: finDia },
+      fecha: { gte: inicio, lte: fin },
     },
   });
 
   return { cierre, anulados };
 };
-
 
 
 
@@ -118,14 +101,12 @@ export const listarCierres = async (restaurantId) => {
 
 
 export const resumenDelDia = async (restaurantId) => {
-  const inicioDia = new Date();
-  inicioDia.setHours(0, 0, 0, 0);
-  const finDia = new Date();
-  finDia.setHours(23, 59, 59, 999);
+  const fecha = fechaNegocioHoy();
+  const { inicio, fin } = rangoDelDia(fecha);
 
   // Todas las del día (para conteo y rango de consecutivos)
   const facturas = await prisma.factura.findMany({
-    where: { restaurantId, fecha: { gte: inicioDia, lte: finDia } },
+    where: { restaurantId, fecha: { gte: inicio, lte: fin } },
     orderBy: { numeroFactura: 'asc' },
   });
 
@@ -137,11 +118,11 @@ export const resumenDelDia = async (restaurantId) => {
   const ingresoReal = totalNeto.minus(totalServicio);
 
   const anulados = await prisma.itemAnulado.findMany({
-    where: { restaurantId, fecha: { gte: inicioDia, lte: finDia } },
+    where: { restaurantId, fecha: { gte: inicio, lte: fin } },
   });
 
   const cierreHoy = await prisma.cierre.findFirst({
-    where: { restaurantId, fecha: inicioDia },
+    where: { restaurantId, fecha: fechaCierre(fecha) },
   });
 
   return {

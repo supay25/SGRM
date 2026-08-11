@@ -1,6 +1,7 @@
 import prisma from '../config/db.js';
 import pkg from '@prisma/client';
 const { Prisma } = pkg;
+import { fechaNegocioHoy, fechaNegocioDe, rangoDelDia, fechaCierre } from '../utils/fechas.js';
 
 export const crearFactura = async (restaurantId, mesaId, descuento = 0, nombreCliente = 'Cliente al contado') => {
   const orden = await prisma.orden.findFirst({
@@ -15,9 +16,9 @@ export const crearFactura = async (restaurantId, mesaId, descuento = 0, nombreCl
   if (orden.items.length === 0) throw new Error('La orden no tiene productos');
 
   // Bloqueo por cierre
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  const cierreHoy = await prisma.cierre.findFirst({ where: { restaurantId, fecha: hoy } });
+  const cierreHoy = await prisma.cierre.findFirst({
+    where: { restaurantId, fecha: fechaCierre(fechaNegocioHoy()) },
+  });
   if (cierreHoy) throw new Error('Ya se realizó el cierre del día, no se puede facturar');
 
   const seccion = orden.mesa.seccion;
@@ -89,28 +90,17 @@ export const crearFactura = async (restaurantId, mesaId, descuento = 0, nombreCl
 };
 
 
-
-
-
-
-
-
-
 export const listarFacturas = async (restaurantId) => {
-  const inicioDia = new Date();
-  const finDia = new Date();
-  inicioDia.setHours(0, 0, 0, 0);
-  finDia.setHours(23, 59, 59, 999);
+  const { inicio, fin } = rangoDelDia(fechaNegocioHoy());
   return await prisma.factura.findMany({
     where: {
       restaurantId,
-      fecha: { gte: inicioDia, lte: finDia },
+      fecha: { gte: inicio, lte: fin },
     },
     include: { seccion: true },
     orderBy: { numeroFactura: 'asc' },
   });
 };
-
 
 
 export const anularFactura = async (restaurantId, facturaId) => {
@@ -122,11 +112,8 @@ export const anularFactura = async (restaurantId, facturaId) => {
   if (factura.anulada) throw new Error('Esta factura ya está anulada');
 
   // No se puede anular una factura de un día ya cerrado
-  const fechaFactura = new Date(factura.fecha);
-  fechaFactura.setHours(0, 0, 0, 0);
-
   const cierre = await prisma.cierre.findFirst({
-    where: { restaurantId, fecha: fechaFactura },
+    where: { restaurantId, fecha: fechaCierre(fechaNegocioDe(factura.fecha)) },
   });
   if (cierre) throw new Error('No se puede anular: el día ya fue cerrado');
 
@@ -139,7 +126,6 @@ export const anularFactura = async (restaurantId, facturaId) => {
 };
 
 
-
 export const obtenerFactura = async (restaurantId, facturaId) => {
   const factura = await prisma.factura.findFirst({
     where: { id: facturaId, restaurantId },
@@ -148,7 +134,6 @@ export const obtenerFactura = async (restaurantId, facturaId) => {
   if (!factura) throw new Error('Factura no encontrada');
   return factura;
 };
-
 
 
 export const editarClienteFactura = async (restaurantId, facturaId, nombreCliente) => {
@@ -162,8 +147,6 @@ export const editarClienteFactura = async (restaurantId, facturaId, nombreClient
     data: { nombreCliente: nombreCliente?.trim() || 'Cliente al contado' },
   });
 };
-
-
 
 
 export const facturarParcial = async (restaurantId, mesaId, itemsAFacturar, descuento = 0, nombreCliente = 'Cliente al contado') => {
@@ -181,9 +164,9 @@ export const facturarParcial = async (restaurantId, mesaId, itemsAFacturar, desc
   if (!itemsAFacturar || itemsAFacturar.length === 0) throw new Error('No se seleccionaron productos');
 
   // Bloqueo por cierre
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  const cierreHoy = await prisma.cierre.findFirst({ where: { restaurantId, fecha: hoy } });
+  const cierreHoy = await prisma.cierre.findFirst({
+    where: { restaurantId, fecha: fechaCierre(fechaNegocioHoy()) },
+  });
   if (cierreHoy) throw new Error('Ya se realizó el cierre del día, no se puede facturar');
 
   // Validar que cada item seleccionado exista en la orden y no exceda la cantidad disponible
@@ -266,13 +249,11 @@ export const facturarParcial = async (restaurantId, mesaId, itemsAFacturar, desc
     for (const x of itemsFactura) {
       const restante = x.ordenItem.cantidad - x.cantidad;
       if (restante > 0) {
-        // Queda cantidad: actualizar
         await tx.ordenItem.update({
           where: { id: x.ordenItem.id },
           data: { cantidad: restante },
         });
       } else {
-        // Se facturó todo ese producto: borrar la línea
         await tx.ordenItem.delete({ where: { id: x.ordenItem.id } });
       }
     }
