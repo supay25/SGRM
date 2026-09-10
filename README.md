@@ -114,4 +114,4 @@ En desarrollo activo. El sistema está desplegado y operativo; actualmente se tr
 
 ## Autor
 
-**Luis Arturo Diaz Uceda** — [GitHub](https://github.com/supay25) · [LinkedIn]([TU_LINKEDIN](https://www.linkedin.com/in/arturo-diaz-uceda-43679a2b7 ))
+**Luis Arturo Diaz Uceda** — [GitHub](https://github.com/supay25) · [LinkedIn](https://www.linkedin.com/in/arturo-diaz-uceda-43679a2b7 )
