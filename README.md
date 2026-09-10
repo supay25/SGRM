@@ -28,7 +28,7 @@ Sistema POS multi-tenant para restaurantes: gestión de mesas, órdenes, factura
 **Backend:** Node.js · Express · API REST
 **Base de datos:** PostgreSQL · Prisma ORM
 **Autenticación:** JWT
-**Despliegue:** Vercel (frontend) · [tu proveedor] (backend y base de datos)
+**Despliegue:** Vercel (frontend) · Railway (backend y base de datos)
 
 ---
 
