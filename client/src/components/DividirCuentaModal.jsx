@@ -62,7 +62,7 @@ export default function DividirCuentaModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 px-4 backdrop-blur-sm"
       onClick={onCancelar}
     >
       <div
@@ -160,7 +160,7 @@ export default function DividirCuentaModal({
               type="button"
               onClick={handleFacturarSeleccionados}
               disabled={unidades === 0}
-              className="flex-1 rounded-lg bg-ember px-4 py-3 text-sm font-bold text-orange-50 shadow-lg shadow-ember/25 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ember"
+              className="flex-1 rounded-lg bg-ember px-4 py-3 text-sm font-bold text-on-ember shadow-lg shadow-ember/25 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ember"
             >
               Facturar seleccionados
             </button>

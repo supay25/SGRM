@@ -3,6 +3,7 @@ import { formatearColones } from '../utils/formato'
 import BotonCerrarX from './BotonCerrarX'
 import BotonImprimir from './BotonImprimir'
 import SeleccionarClienteModal from './SeleccionarClienteModal'
+import useImprimirFactura from '../hooks/useImprimirFactura'
 
 function formatearNumero(numeroFactura) {
   return `#${String(numeroFactura).padStart(3, '0')}`
@@ -17,8 +18,10 @@ function formatearFechaHora(fecha) {
   })
 }
 
-export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar, onEditarCliente }) {
+export default function FacturaBusquedaModal({ numeroBuscado, factura, negocio, onCerrar, onEditarCliente }) {
   const [modalClienteAbierto, setModalClienteAbierto] = useState(false)
+  // El owner consulta facturas de otro restaurante: sus datos llegan por prop.
+  const imprimirFactura = useImprimirFactura(negocio)
 
   useEffect(() => {
     function handleEsc(event) {
@@ -37,7 +40,7 @@ export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar,
   return (
     <>
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 backdrop-blur-sm px-4"
       onClick={onCerrar}
     >
       <div
@@ -132,7 +135,7 @@ export default function FacturaBusquedaModal({ numeroBuscado, factura, onCerrar,
               Editar cliente
             </button>
           )}
-          <BotonImprimir />
+          {factura && <BotonImprimir onImprimir={() => imprimirFactura(factura)} />}
           <button
             type="button"
             onClick={onCerrar}

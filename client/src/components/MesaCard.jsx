@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 const ESTADO_ESTILOS = {
   LIBRE: {
     etiqueta: 'Libre',
-    tarjeta: 'bg-surface-2 border-line-strong shadow-md shadow-black/25',
+    tarjeta: 'bg-surface border-line-strong shadow-md shadow-ink/8',
     badge: 'bg-success/15 text-success ring-1 ring-success/50',
     punto: 'bg-success',
     accion: 'Abrir orden',
@@ -13,7 +13,7 @@ const ESTADO_ESTILOS = {
   OCUPADA: {
     etiqueta: 'Ocupada',
     tarjeta:
-      'bg-surface-2 bg-linear-to-br from-danger/25 via-danger/10 to-transparent border-danger shadow-lg shadow-danger/15',
+      'bg-surface bg-linear-to-br from-danger/15 via-danger/5 to-transparent border-danger shadow-lg shadow-danger/15',
     badge: 'bg-danger text-page ring-1 ring-danger',
     punto: 'bg-page',
     accion: 'Ver orden',
@@ -47,7 +47,7 @@ export default function MesaCard({ mesa, seccion, onAbrir, onEditar, onEliminar 
       className={`
         group relative cursor-pointer overflow-hidden rounded-2xl border-2
         ${estado.tarjeta}
-        hover:-translate-y-1 hover:border-ember hover:shadow-xl hover:shadow-black/40
+        hover:-translate-y-1 hover:border-ember hover:shadow-xl hover:shadow-ink/15
         transition-all duration-200 ease-out
       `}
     >
@@ -81,7 +81,7 @@ export default function MesaCard({ mesa, seccion, onAbrir, onEditar, onEliminar 
                     event.stopPropagation()
                     setMenuAbierto((prev) => !prev)
                   }}
-                  className="rounded-md p-1 text-subtle transition-colors hover:bg-surface-3 hover:text-ink"
+                  className="-m-1.5 flex h-11 w-11 cursor-pointer items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-3 hover:text-ink"
                 >
                   <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
                     <path d="M10 4a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm0 5a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" />
@@ -120,7 +120,7 @@ export default function MesaCard({ mesa, seccion, onAbrir, onEditar, onEliminar 
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/10 pt-3">
+        <div className="mt-4 flex items-center justify-between gap-2 border-t border-line pt-3">
           <span
             className={`text-sm font-semibold transition-colors group-hover:text-ember-light ${
               mesa.estado === 'OCUPADA' ? 'text-ink' : 'text-subtle'

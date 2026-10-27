@@ -25,7 +25,7 @@ function PanelMesa({ titulo, etiqueta, items, resumen, haciaIzquierda, onMover, 
     <div className="flex min-h-0 flex-col rounded-xl border border-line bg-page/40">
       <div className="flex items-baseline justify-between gap-2 border-b border-line px-4 py-3">
         <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">{etiqueta}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">{etiqueta}</p>
           <p className="truncate text-sm font-semibold text-ink">{titulo}</p>
         </div>
         <span className="shrink-0 text-xs text-muted">
@@ -170,7 +170,7 @@ export default function MoverProductosModal({ mesas, secciones, onCerrar, onMovi
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 px-4 backdrop-blur-sm"
       onClick={onCerrar}
     >
       <div
@@ -257,7 +257,7 @@ export default function MoverProductosModal({ mesas, secciones, onCerrar, onMovi
               type="button"
               onClick={handleConfirmar}
               disabled={!ambasElegidas || cargando || guardando}
-              className="flex-1 rounded-lg bg-ember px-4 py-3 text-sm font-bold text-orange-50 shadow-lg shadow-ember/25 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ember"
+              className="flex-1 rounded-lg bg-ember px-4 py-3 text-sm font-bold text-on-ember shadow-lg shadow-ember/25 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ember"
             >
               {guardando ? 'Guardando…' : 'Confirmar cambios'}
             </button>

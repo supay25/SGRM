@@ -2,8 +2,10 @@ import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 
 import { formatearColones } from '../utils/formato'
 import OwnerChartTooltip from './OwnerChartTooltip'
 
-const COLOR_BASE = '#b45309'
-const COLOR_TOP = '#d97706'
+// Sobre fondo claro la jerarquía se invierte: el líder va en el ember profundo
+// (5.2:1) y el resto en un ember más claro que aún llega al 3:1 exigido a gráficos.
+const COLOR_BASE = '#e07a1f'
+const COLOR_TOP = '#c2410c'
 
 export default function OwnerComparativaChart({ data }) {
   const restaurantes = data

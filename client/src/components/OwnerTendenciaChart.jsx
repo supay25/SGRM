@@ -23,7 +23,9 @@ export default function OwnerTendenciaChart({ data }) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <LineChart data={puntos} margin={{ top: 8, right: 12, bottom: 0, left: 0 }}>
-        <CartesianGrid stroke="var(--color-line)" strokeOpacity={0.4} vertical={false} />
+        {/* Sobre fondo claro la rejilla necesita el borde fuerte atenuado: el
+            hairline a 0.4 de opacidad quedaba invisible. */}
+        <CartesianGrid stroke="var(--color-line-strong)" strokeOpacity={0.35} vertical={false} />
         <XAxis
           dataKey="fecha"
           tickLine={false}

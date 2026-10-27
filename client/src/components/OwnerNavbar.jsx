@@ -45,7 +45,7 @@ export default function OwnerNavbar() {
                   px-3 py-2 rounded-md text-sm font-medium transition-colors
                   ${
                     pathname === enlace.ruta
-                      ? 'text-ember bg-ember/10'
+                      ? 'text-ember-light bg-ember/10'
                       : 'text-muted hover:text-ink hover:bg-surface-2'
                   }
                 `}
@@ -94,7 +94,7 @@ export default function OwnerNavbar() {
                   block w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors
                   ${
                     pathname === enlace.ruta
-                      ? 'text-ember bg-ember/10'
+                      ? 'text-ember-light bg-ember/10'
                       : 'text-muted hover:text-ink hover:bg-surface-2'
                   }
                 `}

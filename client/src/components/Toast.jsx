@@ -71,7 +71,7 @@ function ToastAviso({ aviso, onExpirar }) {
       role="status"
       className={`
         animacion-toast flex max-w-sm items-center gap-2.5 rounded-xl border px-4 py-3
-        text-sm font-semibold text-ink shadow-2xl shadow-stone-950/50
+        text-sm font-semibold text-ink shadow-2xl shadow-ink/15
         ${estilos.caja}
       `}
     >

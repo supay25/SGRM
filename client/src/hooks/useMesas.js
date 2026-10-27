@@ -3,28 +3,30 @@ import { getSecciones } from '../api/secciones.api.js'
 import { getMesas, actualizarMesaRequest, eliminarMesaRequest, crearMesaRequest } from '../api/mesas.api.js'
 import useAvisoError from './useAvisoError.js'
 
-// `solido` va a opacidad plena para que el punto de color de cada sección
-// se distinga bien sobre el fondo oscuro.
+// Sobre fondo claro los tonos -300 desaparecían: `texto` usa la variante -700
+// (4.5:1 o mejor sobre blanco y sobre surface-2) y `solido` la -600, que llega al
+// 3:1 exigido a elementos gráficos como el punto y la franja de la tarjeta.
+// Los cuatro tonos se separan también en luminancia, no solo en matiz.
 const PALETA_SECCIONES = [
   {
-    texto: 'text-sky-300',
-    suave: 'bg-sky-400/10 text-sky-300 border-sky-400/25',
-    solido: 'bg-sky-400',
+    texto: 'text-sky-700',
+    suave: 'bg-sky-600/10 text-sky-700 border-sky-600/30',
+    solido: 'bg-sky-600',
   },
   {
-    texto: 'text-violet-300',
-    suave: 'bg-violet-400/10 text-violet-300 border-violet-400/25',
-    solido: 'bg-violet-400',
+    texto: 'text-violet-700',
+    suave: 'bg-violet-600/10 text-violet-700 border-violet-600/30',
+    solido: 'bg-violet-600',
   },
   {
-    texto: 'text-teal-300',
-    suave: 'bg-teal-400/10 text-teal-300 border-teal-400/25',
-    solido: 'bg-teal-400',
+    texto: 'text-teal-700',
+    suave: 'bg-teal-600/10 text-teal-700 border-teal-600/30',
+    solido: 'bg-teal-600',
   },
   {
-    texto: 'text-cyan-300',
-    suave: 'bg-cyan-400/10 text-cyan-300 border-cyan-400/25',
-    solido: 'bg-cyan-400',
+    texto: 'text-fuchsia-700',
+    suave: 'bg-fuchsia-600/10 text-fuchsia-700 border-fuchsia-600/30',
+    solido: 'bg-fuchsia-600',
   },
 ]
 

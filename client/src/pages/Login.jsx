@@ -4,6 +4,65 @@ import { useNavigate } from 'react-router-dom'
 import CampoPassword from '../components/CampoPassword'
 import { rutaInicial } from '../utils/rutas'
 
+// Iconos en SVG (no emojis): heredan currentColor y el tamaño del contenedor,
+// así se mantienen consistentes con el resto del sistema y respetan el tema.
+function Icono({ clase = 'h-5 w-5', children }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={clase}
+    >
+      {children}
+    </svg>
+  )
+}
+
+function IconoCubiertos() {
+  return (
+    <Icono clase="h-7 w-7 text-on-ember">
+      <path d="M3 2v7a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V2" />
+      <path d="M5.5 11v11" />
+      <path d="M19 2a4 4 0 0 0-3 3.87V12a1 1 0 0 0 1 1h2V2Z" />
+      <path d="M18.5 13v9" />
+    </Icono>
+  )
+}
+
+function IconoSobre() {
+  return (
+    <Icono>
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </Icono>
+  )
+}
+
+function IconoCandado() {
+  return (
+    <Icono>
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </Icono>
+  )
+}
+
+function IconoAlerta() {
+  return (
+    <Icono clase="h-4 w-4">
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+      <path d="M12 9v4" />
+      <path d="M12 17h.01" />
+    </Icono>
+  )
+}
+
 export default function Login() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
@@ -42,23 +101,23 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
+    <div className="flex min-h-screen items-center justify-center bg-page px-4 py-10">
 
       {/* Tarjeta principal */}
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-line bg-surface shadow-xl shadow-ink/10">
 
         {/* Encabezado con franja decorativa */}
-        <div className="bg-linear-to-r from-amber-600 to-amber-400 px-8 py-7 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-3">
-            <span className="text-3xl">🍽️</span>
+        <div className="bg-linear-to-br from-ember-dark to-ember px-8 py-7 text-center">
+          <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-on-ember/15 ring-1 ring-on-ember/30">
+            <IconoCubiertos />
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">SGRM</h1>
-          <p className="text-amber-100 text-sm mt-1">Sistema de Gestión de Restaurante</p>
+          <h1 className="text-2xl font-bold tracking-tight text-on-ember">SGRM</h1>
+          <p className="mt-1 text-sm text-on-ember/85">Sistema de Gestión de Restaurante</p>
         </div>
 
         {/* Formulario */}
         <div className="px-8 py-8">
-          <h2 className="text-lg font-semibold text-slate-800 mb-6">
+          <h2 className="mb-6 text-lg font-semibold text-ink">
             Inicia sesión en tu cuenta
           </h2>
 
@@ -68,13 +127,13 @@ export default function Login() {
             <div className="space-y-1.5">
               <label
                 htmlFor="email"
-                className="block text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                className="block text-xs font-semibold uppercase tracking-wider text-muted"
               >
                 Correo electrónico
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-3 flex items-center text-slate-400 text-sm">
-                  ✉️
+                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted">
+                  <IconoSobre />
                 </span>
                 <input
                   id="email"
@@ -85,18 +144,16 @@ export default function Login() {
                   required
                   autoComplete="email"
                   className="
-                    w-full pl-10 pr-4 py-2.5
-                    border border-slate-200 rounded-lg
-                    text-sm text-slate-800 placeholder-slate-400
-                    bg-slate-50
-                    focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent
-                    transition
+                    w-full rounded-lg border border-line-strong bg-surface-2 py-3 pl-10 pr-4
+                    text-sm text-ink placeholder-muted transition
+                    hover:border-ember/60
+                    focus:border-ember focus:outline-none focus:ring-2 focus:ring-ember/40
                   "
                 />
               </div>
             </div>
 
-            {/* Campo Contraseña */}
+            {/* Campo Contraseña: hereda los estilos por token de CampoPassword */}
             <CampoPassword
               id="password"
               etiqueta="Contraseña"
@@ -106,23 +163,15 @@ export default function Login() {
               required
               autoComplete="current-password"
               icono={
-                <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400 text-sm">
-                  🔒
+                <span className="pointer-events-none absolute inset-y-0 left-3 z-10 flex items-center text-muted">
+                  <IconoCandado />
                 </span>
               }
-              claseEtiqueta="block text-xs font-semibold text-slate-500 uppercase tracking-wider"
               claseInput="
-                w-full pl-10 pr-11 py-2.5
-                border border-slate-200 rounded-lg
-                text-sm text-slate-800 placeholder-slate-400
-                bg-slate-50
-                focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent
-                transition
-              "
-              claseOjo="
-                absolute inset-y-0 right-1.5 my-auto flex h-8 w-8 items-center justify-center
-                rounded-md text-slate-400 transition
-                hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-400
+                w-full rounded-lg border border-line-strong bg-surface-2 py-3 pl-10 pr-12
+                text-sm text-ink placeholder-muted transition
+                hover:border-ember/60
+                focus:border-ember focus:outline-none focus:ring-2 focus:ring-ember/40
               "
             />
 
@@ -130,7 +179,7 @@ export default function Login() {
             <div className="flex justify-end">
               <a
                 href="#"
-                className="text-xs font-medium text-amber-600 hover:text-amber-700 transition"
+                className="-mr-2 inline-flex min-h-11 items-center rounded-md px-2 text-xs font-semibold text-ember-light transition-colors hover:text-ember-dark hover:underline"
               >
                 ¿Olvidaste tu contraseña?
               </a>
@@ -147,7 +196,9 @@ export default function Login() {
                   px-4 py-3
                 "
               >
-                <span aria-hidden="true" className="text-danger text-sm leading-5">⚠️</span>
+                <span aria-hidden="true" className="mt-0.5 shrink-0 text-danger">
+                  <IconoAlerta />
+                </span>
                 <p className="text-sm font-medium leading-5 text-danger">{error}</p>
               </div>
             )}
@@ -156,12 +207,11 @@ export default function Login() {
             <button
               type="submit"
               className="
-                w-full py-2.5 mt-1
-                bg-linear-to-r from-amber-600 to-amber-400
-                hover:from-amber-700 hover:to-amber-500
-                text-white font-semibold text-sm rounded-lg
-                shadow-md hover:shadow-lg
-                transition-all duration-200 active:scale-[0.98]
+                mt-1 min-h-12 w-full cursor-pointer
+                rounded-lg bg-ember text-sm font-semibold text-on-ember
+                shadow-md shadow-ember/25
+                transition-colors duration-200
+                hover:bg-ember-dark active:scale-[0.99]
               "
             >
               Iniciar sesión
@@ -171,9 +221,9 @@ export default function Login() {
         </div>
 
         {/* Pie de tarjeta */}
-        <div className="px-8 pb-6 text-center">
-          <span className="inline-flex items-center gap-1.5 text-xs text-slate-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" />
+        <div className="border-t border-line px-8 py-5 text-center">
+          <span className="inline-flex items-center gap-2 text-xs text-muted">
+            <span aria-hidden="true" className="inline-block h-1.5 w-1.5 rounded-full bg-success" />
             Acceso restringido al personal autorizado
           </span>
         </div>

@@ -39,7 +39,7 @@ export default function ConfirmarAccionModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 px-4 backdrop-blur-sm"
       onClick={() => {
         if (!procesando) onCancelar()
       }}
@@ -79,8 +79,8 @@ export default function ConfirmarAccionModal({
               disabled:cursor-not-allowed disabled:opacity-60
               ${
                 destructiva
-                  ? 'bg-danger text-stone-950 shadow-danger/20 hover:bg-rose-300'
-                  : 'bg-ember text-orange-50 shadow-ember/20 hover:bg-ember-dark'
+                  ? 'bg-danger text-on-ember shadow-danger/20 hover:bg-danger-dark'
+                  : 'bg-ember text-on-ember shadow-ember/20 hover:bg-ember-dark'
               }
             `}
           >

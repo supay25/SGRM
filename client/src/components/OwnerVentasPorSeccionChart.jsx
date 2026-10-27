@@ -2,9 +2,12 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 import { formatearColones } from '../utils/formato'
 import OwnerChartTooltip from './OwnerChartTooltip'
 
-// Paleta categórica validada (CVD-safe, all-pairs) para hasta 3 secciones reales;
-// el resto se agrupa en "Otros" con un gris neutro que no compite con las 3 identidades.
-const COLORES = ['#d95926', '#3987e5', '#199e70']
+// Paleta categórica para fondo claro: los tres tonos pasan el 3:1 sobre blanco y
+// además se separan en luminancia (ember .15 / azul .11 / verde .21), de modo que
+// siguen siendo distinguibles con daltonismo; la leyenda de abajo rotula cada
+// sección por nombre, así el color nunca es el único indicador.
+// "Otros" va en gris neutro para no competir con las 3 identidades.
+const COLORES = ['#c2410c', '#1d4ed8', '#2f8f4e']
 const COLOR_OTROS = '#78716c'
 
 function agruparSecciones(porSeccion) {

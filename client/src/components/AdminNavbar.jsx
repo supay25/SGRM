@@ -37,7 +37,7 @@ export default function AdminNavbar() {
 
   const claseEnlaceMovil = ({ isActive }) => `
     block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors
-    ${isActive ? 'bg-ember/10 text-ember' : 'text-muted hover:bg-surface-2 hover:text-ink'}
+    ${isActive ? 'bg-ember/10 text-ember-light' : 'text-muted hover:bg-surface-2 hover:text-ink'}
   `
 
   return (

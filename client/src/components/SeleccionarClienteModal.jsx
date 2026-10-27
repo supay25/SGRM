@@ -41,7 +41,7 @@ export default function SeleccionarClienteModal({
   return (
     // z-60: este sub-modal se abre encima del modal de confirmar factura (z-50).
     <div
-      className="fixed inset-0 z-60 flex items-center justify-center bg-stone-950/60 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-60 flex items-center justify-center bg-overlay/45 px-4 backdrop-blur-sm"
       onClick={onCerrar}
     >
       <div
@@ -86,7 +86,7 @@ export default function SeleccionarClienteModal({
               w-full rounded-lg border px-4 py-3 text-left text-sm font-medium transition
               ${
                 esContado
-                  ? 'border-ember/50 bg-ember/10 text-ember'
+                  ? 'border-ember/50 bg-ember/10 text-ember-light'
                   : 'border-line bg-surface-2/40 text-muted hover:border-ember/50 hover:text-ink'
               }
             `}
@@ -121,7 +121,7 @@ export default function SeleccionarClienteModal({
                         w-full truncate rounded-lg border px-4 py-3 text-left text-sm font-medium transition
                         ${
                           activo
-                            ? 'border-ember/50 bg-ember/10 text-ember'
+                            ? 'border-ember/50 bg-ember/10 text-ember-light'
                             : 'border-line bg-surface-2/40 text-ink hover:border-ember/50 hover:text-ember'
                         }
                       `}

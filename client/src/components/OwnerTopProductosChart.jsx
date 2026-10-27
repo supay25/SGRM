@@ -1,9 +1,10 @@
 import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import OwnerChartTooltip from './OwnerChartTooltip'
 
-// Producto activo (bajo el cursor) resalta en ember; el resto queda en un ember más apagado.
-const COLOR_BASE = '#b45309'
-const COLOR_ACTIVO = '#d97706'
+// Producto activo (bajo el cursor) resalta en el ember profundo (5.2:1 sobre blanco);
+// el resto queda en un ember más claro que aún llega al 3:1 exigido a gráficos.
+const COLOR_BASE = '#e07a1f'
+const COLOR_ACTIVO = '#c2410c'
 
 export default function OwnerTopProductosChart({ data }) {
   const productos = data.map((item) => ({ producto: item.producto, cantidad: Number(item.cantidad) }))

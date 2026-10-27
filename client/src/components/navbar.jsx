@@ -31,7 +31,7 @@ export default function Navbar({ nombreRestaurante, activeLink = 'home', onLogou
   }
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-line-strong bg-surface/95 shadow-lg shadow-black/25 backdrop-blur-sm">
+    <nav className="sticky top-0 z-40 border-b border-line-strong bg-surface/95 shadow-lg shadow-ink/8 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex h-18 items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">

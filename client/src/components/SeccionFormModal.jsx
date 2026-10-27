@@ -60,7 +60,7 @@ export default function SeccionFormModal({ seccion, onCerrar, onGuardar }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 px-4 backdrop-blur-sm"
       onClick={onCerrar}
     >
       <div
@@ -189,7 +189,7 @@ export default function SeccionFormModal({ seccion, onCerrar, onGuardar }) {
             <button
               type="submit"
               disabled={guardando}
-              className="rounded-lg bg-ember px-4 py-2 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg bg-ember px-4 py-2 text-sm font-semibold text-on-ember shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
             >
               {guardando ? 'Guardando...' : esEdicion ? 'Guardar cambios' : 'Crear sección'}
             </button>

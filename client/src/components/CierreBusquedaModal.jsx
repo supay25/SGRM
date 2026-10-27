@@ -42,7 +42,7 @@ export default function CierreBusquedaModal({ fechaBuscada, cierre, hayFacturas,
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 backdrop-blur-sm px-4"
       onClick={onCerrar}
     >
       <div
@@ -97,7 +97,7 @@ export default function CierreBusquedaModal({ fechaBuscada, cierre, hayFacturas,
                       type="button"
                       onClick={handleConfirmarCierre}
                       disabled={cerrando}
-                      className="flex-1 rounded-lg bg-ember px-3 py-2 text-sm font-semibold text-orange-50 transition hover:bg-ember-dark disabled:opacity-60"
+                      className="flex-1 rounded-lg bg-ember px-3 py-2 text-sm font-semibold text-on-ember transition hover:bg-ember-dark disabled:opacity-60"
                     >
                       {cerrando ? 'Cerrando...' : 'Sí, cerrar'}
                     </button>
@@ -115,7 +115,7 @@ export default function CierreBusquedaModal({ fechaBuscada, cierre, hayFacturas,
                 <button
                   type="button"
                   onClick={() => setConfirmando(true)}
-                  className="w-full rounded-lg bg-ember px-4 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark"
+                  className="w-full rounded-lg bg-ember px-4 py-2.5 text-sm font-semibold text-on-ember shadow-md shadow-ember/20 transition hover:bg-ember-dark"
                 >
                   Hacer cierre de este día
                 </button>

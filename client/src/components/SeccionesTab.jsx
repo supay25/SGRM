@@ -59,7 +59,7 @@ export default function SeccionesTab() {
         <button
           type="button"
           onClick={() => setModalSeccion('nueva')}
-          className="rounded-lg bg-ember px-4 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark active:scale-[0.98]"
+          className="rounded-lg bg-ember px-4 py-2.5 text-sm font-semibold text-on-ember shadow-md shadow-ember/20 transition hover:bg-ember-dark active:scale-[0.98]"
         >
           + Nueva sección
         </button>

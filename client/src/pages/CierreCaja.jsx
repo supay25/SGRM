@@ -112,7 +112,7 @@ export default function CierreCaja() {
                   type="button"
                   onClick={() => setModalAbierto(true)}
                   disabled={resumenHoy.cantidad === 0}
-                  className="mt-6 w-full rounded-xl bg-ember px-4 py-4 text-base font-bold text-orange-50 shadow-lg shadow-ember/25 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ember"
+                  className="mt-6 w-full rounded-xl bg-ember px-4 py-4 text-base font-bold text-on-ember shadow-lg shadow-ember/25 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ember"
                 >
                   Cerrar caja del día
                 </button>

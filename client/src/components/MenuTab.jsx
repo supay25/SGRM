@@ -98,7 +98,7 @@ export default function MenuTab() {
                 w-full rounded-lg border px-4 py-3 text-left text-sm font-semibold transition-colors
                 ${
                   categoriaActivaId === null
-                    ? 'border-ember/40 bg-ember/10 text-ember'
+                    ? 'border-ember/40 bg-ember/10 text-ember-light'
                     : 'border-transparent text-muted hover:bg-surface-2 hover:text-ink'
                 }
               `}
@@ -136,7 +136,7 @@ export default function MenuTab() {
             <button
               type="button"
               onClick={() => setModalProducto('nuevo')}
-              className="rounded-lg bg-ember px-4 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark active:scale-[0.98]"
+              className="rounded-lg bg-ember px-4 py-2.5 text-sm font-semibold text-on-ember shadow-md shadow-ember/20 transition hover:bg-ember-dark active:scale-[0.98]"
             >
               + Nuevo producto
             </button>

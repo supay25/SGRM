@@ -27,7 +27,7 @@ export default function FacturaCard({ factura, seleccionada = false, onAbrir }) 
       <span
         className={`
           shrink-0 rounded-lg px-3 py-2 text-xl font-extrabold tracking-tight
-          ${seleccionada ? 'bg-ember/20 text-ember' : 'bg-surface-2 text-ember'}
+          ${seleccionada ? 'bg-ember/20 text-ember-light' : 'bg-surface-2 text-ember'}
         `}
       >
         {formatearNumero(factura.numeroFactura)}

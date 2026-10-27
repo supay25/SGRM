@@ -11,10 +11,19 @@ export default function useOrdenMesa(mesaId) {
   const avisarError = useAvisoError()
   const [mesa, setMesa] = useState(null)
   const [catalogo, setCatalogo] = useState([])
-  const [categoriaActivaId, setCategoriaActivaId] = useState('todas')
+  // null = el catálogo muestra la grilla de categorías; un id = se ven los productos de esa categoría
+  const [categoriaActivaId, setCategoriaActivaId] = useState(null)
   const [lineas, setLineas] = useState([])
   const [ordenGuardadaEnBackend, setOrdenGuardadaEnBackend] = useState(false)
   const [cargando, setCargando] = useState(true)
+
+  // Cambiar de mesa reusa este componente, así que el id se guarda para detectarlo:
+  // al entrar a otra mesa el catálogo vuelve a empezar en la grilla de categorías.
+  const [mesaRenderizada, setMesaRenderizada] = useState(mesaId)
+  if (mesaRenderizada !== mesaId) {
+    setMesaRenderizada(mesaId)
+    setCategoriaActivaId(null)
+  }
 
   const seccion = mesa?.seccion ?? null
 
@@ -75,9 +84,23 @@ export default function useOrdenMesa(mesaId) {
   }, [catalogo])
 
   const productosFiltrados = useMemo(() => {
+    if (categoriaActivaId === null) return []
     if (categoriaActivaId === 'todas') return catalogo
     return catalogo.filter((producto) => producto.categoria.id === categoriaActivaId)
   }, [catalogo, categoriaActivaId])
+
+  // Unidades del borrador agrupadas por categoría, para el indicador de cada tarjeta
+  const unidadesPorCategoria = useMemo(() => {
+    const categoriaDeProducto = new Map(catalogo.map((producto) => [producto.id, producto.categoria.id]))
+    const unidades = { todas: 0 }
+    lineas.forEach((linea) => {
+      unidades.todas += linea.cantidad
+      const categoriaId = categoriaDeProducto.get(linea.productoId)
+      if (categoriaId === undefined) return
+      unidades[categoriaId] = (unidades[categoriaId] ?? 0) + linea.cantidad
+    })
+    return unidades
+  }, [catalogo, lineas])
 
   const cantidadesEnBorrador = useMemo(() => {
     const mapa = {}
@@ -196,6 +219,7 @@ const facturar = useCallback(
     categoriaActivaId,
     setCategoriaActivaId,
     conteoPorCategoria,
+    unidadesPorCategoria,
     productosFiltrados,
     lineas,
     cantidadesEnBorrador,

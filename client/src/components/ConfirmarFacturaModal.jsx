@@ -112,7 +112,7 @@ export default function ConfirmarFacturaModal({
   return (
     <>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 px-4 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 px-4 backdrop-blur-sm"
         onClick={onCerrar}
       >
         <div
@@ -198,7 +198,7 @@ export default function ConfirmarFacturaModal({
                         flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition
                         ${
                           activo
-                            ? 'border-ember/50 bg-ember/10 text-ember'
+                            ? 'border-ember/50 bg-ember/10 text-ember-light'
                             : 'border-line text-muted hover:text-ink'
                         }
                       `}
@@ -284,7 +284,7 @@ export default function ConfirmarFacturaModal({
               type="button"
               onClick={handleFacturar}
               disabled={facturando}
-              className="flex-1 rounded-lg bg-ember px-4 py-3 text-sm font-bold text-orange-50 shadow-lg shadow-ember/25 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-ember"
+              className="flex-1 rounded-lg bg-ember px-4 py-3 text-sm font-bold text-on-ember shadow-lg shadow-ember/25 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-ember"
             >
               {facturando ? 'Facturando...' : 'Facturar'}
             </button>

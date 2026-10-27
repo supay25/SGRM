@@ -19,7 +19,7 @@ export default function ConfirmarDesactivarModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 px-4 backdrop-blur-sm"
       onClick={onCancelar}
     >
       <div
@@ -52,7 +52,7 @@ export default function ConfirmarDesactivarModal({
             type="button"
             onClick={onConfirmar}
             disabled={procesando}
-            className="rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-on-ember shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
           >
             {procesando ? 'Guardando...' : textoConfirmar}
           </button>

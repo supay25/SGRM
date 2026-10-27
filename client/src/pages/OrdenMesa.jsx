@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import CategoriaTabs from '../components/CategoriaTabs'
+import CategoriaGrid from '../components/CategoriaGrid'
 import ProductoCard from '../components/ProductoCard'
 import OrdenLinea from '../components/OrdenLinea'
 import ConfirmarFacturaModal from '../components/ConfirmarFacturaModal'
@@ -24,6 +24,7 @@ export default function OrdenMesa() {
     categoriaActivaId,
     setCategoriaActivaId,
     conteoPorCategoria,
+    unidadesPorCategoria,
     productosFiltrados,
     lineas,
     cantidadesEnBorrador,
@@ -53,6 +54,13 @@ export default function OrdenMesa() {
 
   const totalUnidades = lineas.reduce((acc, linea) => acc + linea.cantidad, 0)
   const hayProductos = lineas.length > 0
+
+  // El catálogo tiene dos vistas y las distingue la categoría activa:
+  // null = grilla de categorías; un id = los productos de esa categoría.
+  const viendoCategorias = categoriaActivaId === null
+  const categoriaActiva = categorias.find((categoria) => categoria.id === categoriaActivaId) ?? null
+  // Sin "Todas" sola en la lista no hay ningún producto cargado en el menú.
+  const hayCatalogo = categorias.length > 1
 
   // Lo que se va a cobrar en esta factura: la orden completa o solo la sub-cuenta elegida.
   const itemsAFacturar = itemsDivididos ?? lineas
@@ -203,7 +211,7 @@ export default function OrdenMesa() {
               setVistaFactura('confirmar')
             }}
             disabled={!hayProductos}
-            className="mt-3 w-full rounded-xl bg-ember px-4 py-4 text-lg font-bold tracking-wide text-orange-50 shadow-lg shadow-ember/30 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ember"
+            className="mt-3 w-full rounded-xl bg-ember px-4 py-4 text-lg font-bold tracking-wide text-on-ember shadow-lg shadow-ember/30 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-ember"
           >
             Facturar
           </button>
@@ -211,26 +219,75 @@ export default function OrdenMesa() {
       </aside>
       {/* COLUMNA DERECHA — el catálogo */}
       <main className="flex min-w-0 flex-1 flex-col lg:h-full lg:min-h-0">
-        <div className="min-w-0 shrink-0 border-b border-line p-4">
-          <CategoriaTabs
-            categorias={categorias}
-            categoriaActivaId={categoriaActivaId}
-            onCambiarCategoria={setCategoriaActivaId}
-            conteos={conteoPorCategoria}
-          />
-        </div>
+        {viendoCategorias ? (
+          <div className="min-w-0 shrink-0 border-b border-line p-4">
+            <h2 className="text-2xl font-bold tracking-tight text-ink">Categorías</h2>
+            <p className="mt-1 text-sm text-subtle">Toca una categoría para ver sus productos.</p>
+          </div>
+        ) : (
+          <div className="min-w-0 shrink-0 border-b border-line p-4">
+            <button
+              type="button"
+              onClick={() => setCategoriaActivaId(null)}
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-strong bg-surface-2 px-4 py-2.5 text-base font-semibold text-subtle transition hover:border-ember hover:text-ember-light active:scale-[0.98]"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="h-5 w-5 shrink-0"
+              >
+                <path d="M19 12H5M11 18l-6-6 6-6" />
+              </svg>
+              Categorías
+            </button>
+
+            <h2 className="mt-3 wrap-break-word text-2xl font-bold tracking-tight text-ink">
+              {categoriaActiva?.nombre ?? 'Productos'}
+            </h2>
+          </div>
+        )}
 
         <div className="p-4 lg:flex-1 lg:min-h-0 lg:overflow-y-auto">
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-4">
-            {productosFiltrados.map((producto) => (
-              <ProductoCard
-                key={producto.id}
-                producto={producto}
-                cantidadEnBorrador={cantidadesEnBorrador[producto.id] ?? 0}
-                onAgregar={agregarProducto}
-              />
-            ))}
-          </div>
+          {viendoCategorias ? (
+            hayCatalogo ? (
+              // key: al volver de los productos la grilla se reanima en lugar de aparecer de golpe
+              <div key="categorias" className="animacion-catalogo">
+                <CategoriaGrid
+                  categorias={categorias}
+                  conteos={conteoPorCategoria}
+                  unidadesEnBorrador={unidadesPorCategoria}
+                  onSeleccionar={setCategoriaActivaId}
+                />
+              </div>
+            ) : (
+              <div className="flex min-h-60 flex-col items-center justify-center px-4 py-12 text-center">
+                <p className="text-base font-semibold text-ink">Todavía no hay productos en el menú.</p>
+                <p className="mt-1.5 text-sm text-subtle">
+                  Pedí al administrador que cargue productos para poder tomar órdenes.
+                </p>
+              </div>
+            )
+          ) : (
+            // key por categoría: cada cambio de categoría vuelve a animar la grilla
+            <div
+              key={categoriaActivaId}
+              className="animacion-catalogo grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3 2xl:grid-cols-4"
+            >
+              {productosFiltrados.map((producto) => (
+                <ProductoCard
+                  key={producto.id}
+                  producto={producto}
+                  cantidadEnBorrador={cantidadesEnBorrador[producto.id] ?? 0}
+                  onAgregar={agregarProducto}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </main>
 

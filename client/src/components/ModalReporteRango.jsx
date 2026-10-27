@@ -21,7 +21,7 @@ export default function ModalReporteRango({ titulo, desde, hasta, onCerrar, chil
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 backdrop-blur-sm px-4"
       onClick={onCerrar}
     >
       <div

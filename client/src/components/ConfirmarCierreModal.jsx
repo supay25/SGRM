@@ -11,7 +11,7 @@ export default function ConfirmarCierreModal({ cerrando, onCancelar, onConfirmar
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 backdrop-blur-sm px-4"
       onClick={onCancelar}
     >
       <div
@@ -41,7 +41,7 @@ export default function ConfirmarCierreModal({ cerrando, onCancelar, onConfirmar
             type="button"
             onClick={onConfirmar}
             disabled={cerrando}
-            className="px-5 py-2.5 rounded-lg text-sm font-semibold text-orange-50 bg-ember hover:bg-ember-dark shadow-md shadow-ember/20 transition disabled:cursor-not-allowed disabled:opacity-60"
+            className="px-5 py-2.5 rounded-lg text-sm font-semibold text-on-ember bg-ember hover:bg-ember-dark shadow-md shadow-ember/20 transition disabled:cursor-not-allowed disabled:opacity-60"
           >
             {cerrando ? 'Cerrando...' : 'Sí, cerrar caja'}
           </button>

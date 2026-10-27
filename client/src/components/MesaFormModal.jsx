@@ -33,7 +33,7 @@ export default function MesaFormModal({ mesa, secciones, seccionSugeridaId, onCe
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 backdrop-blur-sm px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 backdrop-blur-sm px-4"
       onClick={onCerrar}
     >
       <div
@@ -110,7 +110,7 @@ export default function MesaFormModal({ mesa, secciones, seccionSugeridaId, onCe
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded-lg text-sm font-semibold text-orange-50 bg-ember hover:bg-ember-dark shadow-md shadow-ember/20 transition"
+              className="px-4 py-2 rounded-lg text-sm font-semibold text-on-ember bg-ember hover:bg-ember-dark shadow-md shadow-ember/20 transition"
             >
               {esEdicion ? 'Guardar cambios' : 'Agregar mesa'}
             </button>

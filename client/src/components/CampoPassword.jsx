@@ -6,18 +6,21 @@ import { useState } from 'react'
 
 const CLASE_ETIQUETA = 'block text-xs font-semibold uppercase tracking-wider text-muted'
 
-// Mismo estilo que los inputs del tema oscuro, con espacio a la derecha para el ojo
+// Alto mínimo 44px (py-3 + text-sm) para que el campo sea cómodo en tablet,
+// con espacio a la derecha para el ojo. El borde fuerte evita que el input se
+// pierda contra la tarjeta blanca.
 const CLASE_INPUT = `
-  w-full rounded-lg border border-line bg-surface-2 py-2.5 pl-3 pr-11
+  w-full rounded-lg border border-line-strong bg-surface-2 py-3 pl-3 pr-12
   text-sm text-ink placeholder-muted transition
-  focus:border-transparent focus:outline-none focus:ring-2 focus:ring-ember/60
+  hover:border-ember/60
+  focus:border-ember focus:outline-none focus:ring-2 focus:ring-ember/40
   disabled:cursor-not-allowed disabled:opacity-60
 `
 
 const CLASE_OJO = `
-  absolute inset-y-0 right-1.5 my-auto flex h-8 w-8 items-center justify-center
+  absolute inset-y-0 right-0.5 my-auto flex h-11 w-11 cursor-pointer items-center justify-center
   rounded-md text-muted transition
-  hover:text-ink focus:outline-none focus:ring-2 focus:ring-ember/60
+  hover:bg-surface-3 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ember
   disabled:cursor-not-allowed disabled:opacity-60
 `
 

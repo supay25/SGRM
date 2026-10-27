@@ -204,7 +204,7 @@ export default function OwnerRestaurante() {
                         type="button"
                         onClick={handleBuscarCierre}
                         disabled={!fechaBusqueda || buscandoCierre}
-                        className="shrink-0 rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
+                        className="shrink-0 rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-on-ember shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {buscandoCierre ? 'Buscando...' : 'Buscar'}
                       </button>
@@ -227,7 +227,7 @@ export default function OwnerRestaurante() {
                         type="button"
                         onClick={handleBuscarFactura}
                         disabled={!numeroBusqueda.trim() || buscandoFactura}
-                        className="shrink-0 rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
+                        className="shrink-0 rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-on-ember shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {buscandoFactura ? 'Buscando...' : 'Buscar'}
                       </button>
@@ -357,6 +357,7 @@ export default function OwnerRestaurante() {
         <FacturaBusquedaModal
           numeroBuscado={numeroModal}
           factura={facturaEncontrada}
+          negocio={detalle}
           onCerrar={() => setModalFacturaAbierto(false)}
         />
       )}

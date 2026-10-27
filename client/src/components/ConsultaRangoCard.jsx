@@ -49,7 +49,7 @@ export default function ConsultaRangoCard({ titulo, onConsultar, children }) {
           type="button"
           onClick={handleConsultar}
           disabled={!desde || !hasta || cargando}
-          className="shrink-0 rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
+          className="shrink-0 rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-on-ember shadow-md shadow-ember/20 transition hover:bg-ember-dark disabled:cursor-not-allowed disabled:opacity-60"
         >
           {cargando ? 'Consultando...' : 'Consultar'}
         </button>

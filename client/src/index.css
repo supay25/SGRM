@@ -1,25 +1,48 @@
 @import "tailwindcss";
 
-/* Identidad visual SGRM: gris oscuro minimalista, tipografía clara, acentos sobrios */
+/* Identidad visual SGRM: tema claro elegante, neutros cálidos y acento ember.
+   Todos los contrastes están verificados contra WCAG 2.1 (4.5:1 texto, 3:1 bordes).
+   La escala de superficies sube hacia el blanco: page (fondo) < surface (tarjeta). */
 @theme {
-  --color-page: #1c1917;
-  --color-surface: #292524;
-  --color-surface-2: #44403c;
-  /* Superficie elevada: tarjetas que deben despegarse del fondo de página */
-  --color-surface-3: #57534e;
-  --color-line: #57534e;
-  /* Borde de alto contraste para elementos que no se pueden perder en el fondo */
-  --color-line-strong: #857f7a;
-  --color-ink: #f4f4f5;
-  /* Texto secundario legible (el muted queda para datos de apoyo) */
-  --color-subtle: #d6d3d1;
-  --color-muted: #a8a29e;
-  --color-ember: #d97706;
-  /* Variante clara del acento: para texto/íconos sobre fondo oscuro */
-  --color-ember-light: #f59e0b;
-  --color-ember-dark: #b45309;
-  --color-success: #34d399;
-  --color-danger: #fb7185;
+  /* Fondo de página: blanco cálido, no blanco puro, para no deslumbrar con luz ambiente */
+  --color-page: #f7f6f4;
+  /* Tarjetas y paneles: blanco limpio, se despegan del fondo sin necesidad de sombra */
+  --color-surface: #ffffff;
+  /* Panel anidado / input / fila alterna: un paso de gris sobre la tarjeta */
+  --color-surface-2: #f1efec;
+  /* Hover sobre surface-2 y zonas hundidas: el paso más marcado de la escala */
+  --color-surface-3: #e5e1db;
+
+  /* Hairline: separa sin pesar (divisores, bordes internos) */
+  --color-line: #dcd8d1;
+  /* Borde de alto contraste (3.26:1 sobre blanco): tarjetas y controles que no se pueden perder */
+  --color-line-strong: #968d84;
+
+  /* Texto principal: 17.5:1 sobre blanco */
+  --color-ink: #1c1917;
+  /* Texto secundario: 10.3:1 sobre blanco */
+  --color-subtle: #44403c;
+  /* Texto de apoyo (etiquetas, metadatos): 5.7:1 sobre blanco, 5.0:1 sobre surface-2.
+     Es el gris más claro permitido; nada por debajo de esto lleva texto. */
+  --color-muted: #6b6660;
+
+  /* Acento de marca. El ember original (#d97706) daba 3.2:1 sobre blanco y no pasaba
+     para texto ni como fondo de botón: se profundizó a 5.2:1 conservando el tono. */
+  --color-ember: #c2410c;
+  /* Ember de énfasis para texto e iconos sobre fondos claros y sobre ember/15 (5.6:1) */
+  --color-ember-light: #a33209;
+  /* Hover de botones ember: claramente más oscuro, nunca más claro */
+  --color-ember-dark: #7c2d12;
+  /* Texto e iconos sobre relleno ember (5.0:1) */
+  --color-on-ember: #fffaf5;
+
+  /* Estados. Ambos llevan texto claro encima y pasan 4.5:1 sobre surface y surface-2. */
+  --color-success: #166534;
+  --color-danger: #b91c1c;
+  --color-danger-dark: #8f1515;
+
+  /* Velo de los modales: carbón cálido en baja opacidad, no negro puro */
+  --color-overlay: #2b2521;
 }
 
 /* Entrada de los avisos (toast): breve y sin rebote */
@@ -38,19 +61,21 @@
   animation: sgrm-aviso-entra 180ms ease-out;
 }
 
-/* Tiras de tabs: se recorren en horizontal sin mostrar la barra nativa */
-.scrollbar-tabs {
-  scrollbar-width: none;
-  scroll-behavior: smooth;
-  /* Desplazamiento táctil fluido, sin arrastrar la pantalla de atrás */
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: contain;
-  /* Al llevar una tab a la vista queda separada del borde, no pegada */
-  scroll-padding-inline: 1rem;
+/* Catálogo de la mesa: al pasar de categorías a productos (y al cambiar de
+   categoría) la grilla entra con un desplazamiento mínimo, sin rebote. */
+@keyframes sgrm-catalogo-entra {
+  from {
+    opacity: 0;
+    transform: translateY(0.375rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.scrollbar-tabs::-webkit-scrollbar {
-  display: none;
+.animacion-catalogo {
+  animation: sgrm-catalogo-entra 200ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -58,7 +83,28 @@
     animation: none;
   }
 
-  .scrollbar-tabs {
-    scroll-behavior: auto;
+  .animacion-catalogo {
+    animation: none;
   }
+}
+
+/* El navegador pinta los controles nativos (scrollbars, autofill, date picker)
+   según este esquema: sin declararlo, en un SO en modo oscuro quedan oscuros
+   sobre el tema claro. */
+:root {
+  color-scheme: light;
+}
+
+/* Cuerpo mínimo legible y foco visible en todo control, sin repetirlo por componente */
+body {
+  background-color: var(--color-page);
+  color: var(--color-ink);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-ember);
+  outline-offset: 2px;
 }

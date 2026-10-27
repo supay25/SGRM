@@ -12,12 +12,12 @@ export default function ProductoCard({ producto, cantidadEnBorrador = 0, onAgreg
         ${
           cantidadEnBorrador > 0
             ? 'border-ember bg-ember/15 shadow-lg shadow-ember/20'
-            : 'border-line-strong bg-surface-2 shadow-md shadow-black/25 hover:-translate-y-0.5 hover:border-ember hover:shadow-lg hover:shadow-black/40'
+            : 'border-line-strong bg-surface-2 shadow-md shadow-ink/8 hover:-translate-y-0.5 hover:border-ember hover:shadow-lg hover:shadow-ink/15'
         }
       `}
     >
       {cantidadEnBorrador > 0 && (
-        <span className="absolute -right-2.5 -top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-ember text-base font-bold text-orange-50 shadow-md shadow-ember/40 ring-2 ring-page">
+        <span className="absolute -right-2.5 -top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-ember text-base font-bold text-on-ember shadow-md shadow-ember/40 ring-2 ring-page">
           {cantidadEnBorrador}
         </span>
       )}

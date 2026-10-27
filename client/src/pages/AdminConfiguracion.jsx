@@ -18,7 +18,7 @@ function BotonGuardar({ guardando, children }) {
       type="submit"
       disabled={guardando}
       className="
-        rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-orange-50
+        rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-on-ember
         shadow-md shadow-ember/20 transition hover:bg-ember-dark active:scale-[0.98]
         disabled:cursor-not-allowed disabled:opacity-60
       "

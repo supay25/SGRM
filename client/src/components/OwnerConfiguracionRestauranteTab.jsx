@@ -218,7 +218,7 @@ export default function OwnerConfiguracionRestauranteTab({ restauranteId, restau
             <button
               type="submit"
               disabled={guardandoDatos}
-              className="rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-on-ember shadow-md shadow-ember/20 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {guardandoDatos ? 'Guardando...' : 'Guardar cambios'}
             </button>
@@ -263,7 +263,7 @@ export default function OwnerConfiguracionRestauranteTab({ restauranteId, restau
             <button
               type="submit"
               disabled={reseteando}
-              className="rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-orange-50 shadow-md shadow-ember/20 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-lg bg-ember px-5 py-2.5 text-sm font-semibold text-on-ember shadow-md shadow-ember/20 transition hover:bg-ember-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {reseteando ? 'Reseteando...' : 'Resetear contraseña'}
             </button>

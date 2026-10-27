@@ -14,7 +14,7 @@ export default function SeccionTabs({ secciones, seccionActivaId, onCambiarSecci
               transition-all duration-200 ease-out
               ${
                 activa
-                  ? 'border-ember bg-ember text-orange-50 shadow-lg shadow-ember/25'
+                  ? 'border-ember bg-ember text-on-ember shadow-lg shadow-ember/25'
                   : 'border-line-strong bg-surface text-subtle hover:border-ember/50 hover:bg-surface-2 hover:text-ink'
               }
             `}
@@ -23,7 +23,7 @@ export default function SeccionTabs({ secciones, seccionActivaId, onCambiarSecci
               className={`
                 h-3 w-3 shrink-0 rounded-full transition-shadow duration-200
                 ${seccion.colores.solido}
-                ${activa ? 'ring-2 ring-white/70' : 'ring-2 ring-white/15'}
+                ${activa ? 'ring-2 ring-on-ember/80' : 'ring-2 ring-line-strong/40'}
               `}
             />
             {seccion.nombre}
